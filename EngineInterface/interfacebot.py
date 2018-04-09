@@ -7,6 +7,7 @@ class InterfaceBot:
         self.moves = 0
 
     def get_move(self, pos, tleft):
+        import time
         from filelock import FileLock
         lmoves = pos.legal_moves()
 
@@ -28,17 +29,24 @@ class InterfaceBot:
         #result read phase; must check that result has been written
         recieved_selection = False
         while (not recieved_selection):
+            #sleep for 0.25 seconds to give time for selection to be made
+            time.sleep(0.25)
+
+            #try to read selection
             lock.acquire()
             try:
                 pipe = open(self.pipe_path, "r+")
                 
                 #check that file has been updated
                 first_line = pipe.readline()
+                expected = 'selection_' + str(self.moves)
+                if (expected in first_line):
+                    recieved_selection = True
 
-                #TODO: read from file
+                    #TODO: read from file
 
-                pipe.close();
+                    return lmoves[0];
+
+                    pipe.close();
             finally:
                 lock.release()
-
-        return lmoves[0];
