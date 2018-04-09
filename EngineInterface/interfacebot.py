@@ -27,8 +27,8 @@ class InterfaceBot:
             lock.release()
 
         #result read phase; must check that result has been written
-        recieved_selection = False
-        while (not recieved_selection):
+        received_selection = False
+        while (not received_selection):
             #sleep for 0.25 seconds to give time for selection to be made
             time.sleep(0.25)
 
@@ -41,7 +41,7 @@ class InterfaceBot:
                 first_line = pipe.readline()
                 expected = 'selection_' + str(self.moves)
                 if (expected in first_line):
-                    recieved_selection = True
+                    received_selection = True
 
                     #TODO: read from file
                     pipe.close();
