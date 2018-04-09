@@ -44,9 +44,9 @@ class InterfaceBot:
                     recieved_selection = True
 
                     #TODO: read from file
-
+                    pipe.close();
                     return lmoves[0];
 
-                    pipe.close();
+                pipe.close();
             finally:
                 lock.release()
