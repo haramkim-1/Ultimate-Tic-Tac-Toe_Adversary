@@ -29,8 +29,8 @@ class InterfaceBot:
         #result read phase; must check that result has been written
         received_selection = False
         while (not received_selection):
-            #sleep for 0.25 seconds to give time for selection to be made
-            time.sleep(0.25)
+            #sleep for a duration to give time for selection to be made
+            time.sleep(0.001)
 
             #try to read selection
             lock.acquire()
