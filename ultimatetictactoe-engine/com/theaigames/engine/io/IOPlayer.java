@@ -39,13 +39,14 @@ public class IOPlayer implements Runnable {
     private int errorCounter;
     private boolean finished;
     private String idString;
+    private boolean LOG_MOVES;
     
     private final int MAX_ERRORS = 2;
     private final String NULL_MOVE = "no_moves";
     
     public String response;
     
-    public IOPlayer(Process process, String idString) {
+    public IOPlayer(Process process, String idString, boolean LOG_MOVES) {
         this.inputStream = new OutputStreamWriter(process.getOutputStream());
     	this.outputGobbler = new InputStreamGobbler(process.getInputStream(), this, "output");
     	this.errorGobbler = new InputStreamGobbler(process.getErrorStream(), this, "error");
@@ -54,6 +55,7 @@ public class IOPlayer implements Runnable {
         this.dump = new StringBuilder();
         this.errorCounter = 0;
         this.finished = false;
+        this.LOG_MOVES = LOG_MOVES;
     }
     
     /**
@@ -63,6 +65,8 @@ public class IOPlayer implements Runnable {
      */
     public void writeToBot(String line) throws IOException {
         if (!this.finished) {
+            if (LOG_MOVES)
+                System.out.println("GAME: " + line); //EDIT
             try {
         		this.inputStream.write(line + "\n");
         		this.inputStream.flush();
