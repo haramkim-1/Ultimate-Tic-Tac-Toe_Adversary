@@ -38,12 +38,14 @@ public class Processor implements GameHandler {
 	private List<MoveResult> mMoveResults;
 	private Field mField;
 	private int mGameOverByPlayerErrorPlayerId = 0;
+	private boolean LOG_MOVES;
 
-	public Processor(List<Player> players, Field field) {
+	public Processor(List<Player> players, Field field, boolean LOG_MOVES) {
 		mPlayers = players;
 		mField = field;
 		mMoves = new ArrayList<>();
 		mMoveResults = new ArrayList<>();
+		this.LOG_MOVES = LOG_MOVES;
 	}
 
 	@Override
@@ -73,6 +75,8 @@ public class Processor implements GameHandler {
 	 * @return : true if valid move, otherwise false
 	 */
 	private Boolean parseResponse(String r, Player player) {
+		if (LOG_MOVES)
+			System.out.println("Player "+player.getId() + ": " + r);
 		String[] parts = r.split(" ");
 		String oldFieldPresentationString = mField.toPresentationString(player.getId(), true);
 		if (parts[0].equals("place_move")) {

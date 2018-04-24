@@ -35,7 +35,7 @@ public class Tictactoe extends AbstractGame {
 		this.players.forEach(this::sendSettings);
 		
 		// create the processor
-		super.processor = new Processor(this.players, mField);
+		super.processor = new Processor(this.players, mField, LOG_MOVES);
 	}
 
 	private void sendSettings(Player player) {

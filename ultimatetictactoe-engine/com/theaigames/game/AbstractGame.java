@@ -26,6 +26,7 @@ import java.util.List;
 import com.theaigames.engine.Engine;
 import com.theaigames.engine.Logic;
 import com.theaigames.engine.io.IOPlayer;
+import com.theaigames.game.player.AbstractPlayer;
 
 /**
  * abstract class AbstractGame
@@ -48,6 +49,7 @@ public abstract class AbstractGame implements Logic {
 	public boolean DEV_MODE = false; // turn this on for local testing
 	public String TEST_BOT; // command for the test bot in DEV_MODE
 	public int NUM_TEST_BOTS; // number of bots for this game
+	protected boolean LOG_MOVES = true; // whether game/player messages should be logged. Modification.
 	
 	public AbstractGame() {
 		maxRounds = -1; // set this later if there is a maximum amount of rounds for this game
@@ -74,7 +76,7 @@ public abstract class AbstractGame implements Logic {
             }
             
             for (int i = 0; i < NUM_TEST_BOTS; i++) {
-                this.engine.addPlayer(TEST_BOT, "ID_" + i);
+                this.engine.addPlayer(TEST_BOT, "ID_" + i, LOG_MOVES);
             }
             
             return;
@@ -99,7 +101,7 @@ public abstract class AbstractGame implements Logic {
 
 		// add the players
 		for(int i=0; i < botIds.size(); i++) {
-			this.engine.addPlayer(botDirs.get(i), botIds.get(i));
+			this.engine.addPlayer(botDirs.get(i), botIds.get(i), LOG_MOVES);
 		}
 	}
 	
@@ -161,7 +163,11 @@ public abstract class AbstractGame implements Logic {
 	 * Does everything that is needed to store the output of a game
 	 */
 	public void saveGame() {
-		System.out.println("winner: " + this.processor.getWinner().getName());
+		AbstractPlayer winner = this.processor.getWinner();
+		if (winner == null)
+			System.out.println("Draw!");
+		else
+			System.out.println("winner: " + this.processor.getWinner().getName());
 
 		// save results to file here
 		String playedGame = this.processor.getPlayedGame();

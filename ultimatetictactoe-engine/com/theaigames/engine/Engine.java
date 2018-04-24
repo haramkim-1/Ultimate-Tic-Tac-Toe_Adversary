@@ -48,13 +48,13 @@ public class Engine {
      * Start up the bot process and add the player to the game
      * @param command : command to start a bot process
      */
-    public void addPlayer(String command, String idString) throws IOException {
+    public void addPlayer(String command, String idString, boolean LOG_MOVES) throws IOException {
 
         // Create new process
     	Process process = Runtime.getRuntime().exec(command);
 
         // Attach IO to process
-        IOPlayer player = new IOPlayer(process, idString);
+        IOPlayer player = new IOPlayer(process, idString, LOG_MOVES);
         
         // Add player
         this.players.add(player);
