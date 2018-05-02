@@ -24,15 +24,17 @@ def parse_command(instr, bot, pos):
 if __name__ == '__main__':
     import sys
     import uuid
+    from filelock import FileLock
     from position import Position
     from interfacebot import InterfaceBot
 
-    str_uuid = str(uuid.uuid1)
-    interface_pipe_path = str_uuid + '_pipe'
-    interface_lock_path = str_uuid + '_pipe.lock'
+    prefix = sys.argv[1]
+    interface_pipe_path = prefix + '_pipe'
+    interface_lock_path = prefix + '_pipe.lock'
+    lock = FileLock(interface_lock_path)
 
     pos = Position()
-    bot = InterfaceBot(interface_pipe_path, interface_lock_path)
+    bot = InterfaceBot(interface_pipe_path, interface_lock_path, lock)
     
     while True:
         try:
