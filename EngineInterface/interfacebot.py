@@ -17,7 +17,7 @@ class InterfaceBot:
         self.lock.acquire()
         try:
             pipe = open(self.pipe_path, "w+")
-            pipe.write("sent")
+            pipe.write("state\n")
             
             #TODO: Write to file
             
@@ -35,7 +35,7 @@ class InterfaceBot:
                 
                 #check that file has been updated
                 first_line = pipe.readline()
-                if ("recieved" in first_line):
+                if ("move" in first_line):
                     received_selection = True
 
                     #TODO: read from file

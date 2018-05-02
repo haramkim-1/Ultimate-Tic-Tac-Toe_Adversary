@@ -1,6 +1,5 @@
 import neat
 import time
-from filelock import FileLock
 
 training_bots = []
 
@@ -18,13 +17,17 @@ def eval_genomes(genomes, config):
         genome.fitness  = cumulative_fitness / len(training_bots)
 
 class EngineConnector:
-    def __init__(self):
+    def __init__(self, bot_start_cms):
         import uuid
+        import subprocess
+        from filelock import FileLock
         self.str_uuid = str(uuid.uuid1)
-        self.interface_pipe_path = self.str_uuid + '_pipe'
-        self.interface_lock_path = self.str_uuid + '_pipe.lock'
-        self.ibot_launch_str = "python EngineInterface/main.py"
+        self.interface_pipe_path = self.str_uuid + "_pipe"
+        self.interface_lock_path = self.str_uuid + "_pipe.lock"
         self.lock = FileLock(self.interface_lock_path)
+        ibot_launch_str = "python ../EngineInterface/main.py " + self.str_uuid
+        engine_launch_str = "TODO"
+        self.engine_process = subprocess.Popen(engine_launch_str, shell=True)
 
     def read_move(self):
         recieved = ""
@@ -36,7 +39,7 @@ class EngineConnector:
                 pipe = open(self.interface_pipe_path, "r+")
                 #check that file has been updated
                 first_line = pipe.readline()
-                expected = "sent"
+                expected = "state"
                 if (expected in first_line):
                     received_selection = True
                     recieved = pipe.read()
@@ -53,7 +56,7 @@ class EngineConnector:
         self.lock.acquire()
         try:
             pipe = open(self.interface_pipe_path, "w+")
-            pipe.write("response\n")
+            pipe.write("move\n")
             pipe.write(selection)    
             pipe.close()
         finally:
