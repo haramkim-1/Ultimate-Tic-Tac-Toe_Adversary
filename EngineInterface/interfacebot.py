@@ -10,17 +10,13 @@ class InterfaceBot:
     def get_move(self, pos, tleft):
         import time
         lmoves = pos.legal_moves()
-
-        # TODO: write position and moves, then read result
         
         #write phase
         self.lock.acquire()
         try:
             pipe = open(self.pipe_path, "w+")
-            pipe.write("state\n")
-            
-            #TODO: Write to file
-            
+            to_write = "state\nmacroboard\n" + pos.get_macroboard + "\n" + str(lmoves)
+            pipe.write(to_write)
             pipe.close()
         finally:
             self.lock.release()
@@ -39,6 +35,7 @@ class InterfaceBot:
                     received_selection = True
 
                     #TODO: read from file
+                    input("wait for input")
                     pipe.close();
                     return lmoves[0];
 

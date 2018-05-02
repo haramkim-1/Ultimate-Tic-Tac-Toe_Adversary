@@ -20,12 +20,19 @@ class EngineConnector:
     def __init__(self, bot_start_cms):
         import uuid
         import subprocess
+        import os
         from filelock import FileLock
         self.str_uuid = str(uuid.uuid1)
         self.interface_pipe_path = self.str_uuid + "_pipe"
         self.interface_lock_path = self.str_uuid + "_pipe.lock"
         self.lock = FileLock(self.interface_lock_path)
-        ibot_launch_str = "python ../EngineInterface/main.py " + self.str_uuid
+        
+        #create pipe file if it does not exist
+        pipe = open(self.interface_pipe_path, "w+")
+        pipe.close()
+
+        #run engine
+        ibot_launch_str = "python ../EngineInterface/main.py " + os.path.abspath(self.interface_pipe_path)
         engine_launch_str = "TODO"
         self.engine_process = subprocess.Popen(engine_launch_str, shell=True)
 

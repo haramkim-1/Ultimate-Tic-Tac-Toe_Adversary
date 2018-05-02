@@ -29,8 +29,8 @@ if __name__ == '__main__':
     from interfacebot import InterfaceBot
 
     prefix = sys.argv[1]
-    interface_pipe_path = prefix + '_pipe'
-    interface_lock_path = prefix + '_pipe.lock'
+    interface_pipe_path = prefix
+    interface_lock_path = prefix + '.lock'
     lock = FileLock(interface_lock_path)
 
     pos = Position()
