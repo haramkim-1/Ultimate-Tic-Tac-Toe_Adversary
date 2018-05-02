@@ -1,10 +1,11 @@
 
 class InterfaceBot:
 
-    def __init__(self, p_file, p_file_lock):
+    def __init__(self, p_file, p_file_lock, lock):
         self.pipe_path = p_file
         self.pipe_lock_path = p_file_lock
         self.moves = 0
+        self.lock = lock
 
     def get_move(self, pos, tleft):
         import time
@@ -12,10 +13,9 @@ class InterfaceBot:
         lmoves = pos.legal_moves()
 
         # TODO: write position and moves, then read result
-        lock = FileLock(self.pipe_lock_path)
         
         #write phase
-        lock.acquire()
+        self.lock.acquire()
         try:
             pipe = open(self.pipe_path, "w+")
             pipe.write('state_' + str(self.moves) + '\n')
@@ -24,13 +24,13 @@ class InterfaceBot:
             
             pipe.close()
         finally:
-            lock.release()
+            self.lock.release()
 
         #result read phase; must check that result has been written
         received_selection = False
         while (not received_selection):
             #try to read selection
-            lock.acquire()
+            self.lock.acquire()
             try:
                 pipe = open(self.pipe_path, "r+")
                 
@@ -46,7 +46,7 @@ class InterfaceBot:
 
                 pipe.close();
             finally:
-                lock.release()
+                self.lock.release()
 
             #sleep for a duration to give time for selection to be made
             time.sleep(0.001)
