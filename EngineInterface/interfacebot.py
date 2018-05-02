@@ -9,7 +9,6 @@ class InterfaceBot:
 
     def get_move(self, pos, tleft):
         import time
-        from filelock import FileLock
         lmoves = pos.legal_moves()
 
         # TODO: write position and moves, then read result
@@ -18,7 +17,7 @@ class InterfaceBot:
         self.lock.acquire()
         try:
             pipe = open(self.pipe_path, "w+")
-            pipe.write('state_' + str(self.moves) + '\n')
+            pipe.write("sent")
             
             #TODO: Write to file
             
@@ -36,8 +35,7 @@ class InterfaceBot:
                 
                 #check that file has been updated
                 first_line = pipe.readline()
-                expected = 'selection_' + str(self.moves)
-                if (expected in first_line):
+                if ("recieved" in first_line):
                     received_selection = True
 
                     #TODO: read from file

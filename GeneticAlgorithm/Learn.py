@@ -25,40 +25,36 @@ class EngineConnector:
         self.interface_lock_path = self.str_uuid + '_pipe.lock'
         self.ibot_launch_str = "python EngineInterface/main.py"
         self.lock = FileLock(self.interface_lock_path)
-        
 
-def send_move(selection, connector):
-    #result read phase; must check that result has been written
-    received_selection = False
-    while (not received_selection):
-        #try to read selection
-        connector.lock.acquire()
-        try:
-            pipe = open(connector.interface_pipe_path, "r+")
-            
-            #check that file has been updated
-            first_line = pipe.readline()
-            expected = "sent"
-            if (expected in first_line):
-                received_selection = True
-                print(pipe.read())
+    def read_move(self):
+        recieved = ""
+        received_selection = False
+        while (not received_selection):
+            #try to read selection
+            self.lock.acquire()
+            try:
+                pipe = open(self.interface_pipe_path, "r+")
+                #check that file has been updated
+                first_line = pipe.readline()
+                expected = "sent"
+                if (expected in first_line):
+                    received_selection = True
+                    recieved = pipe.read()
+                    print(recieved) #TODO: Remove this line
+                    pipe.close()
                 pipe.close()
+            finally:
+                self.lock.release()
+            #sleep for a duration to give time for selection to be made
+            time.sleep(0.001)
+        return recieved
 
+    def send_move(self, selection):
+        self.lock.acquire()
+        try:
+            pipe = open(self.interface_pipe_path, "w+")
+            pipe.write("response\n")
+            pipe.write(selection)    
             pipe.close()
         finally:
-            connector.lock.release()
-
-        #sleep for a duration to give time for selection to be made
-        time.sleep(0.001)
-
-    #write phase
-    connector.lock.acquire()
-    try:
-        pipe = open(connector.interface_pipe_path, "w+")
-        pipe.write("response\n")
-        pipe.write(input("Enter text: "))
-        print("\n")
-        
-        pipe.close()
-    finally:
-        connector.lock.release()
+            self.lock.release()
