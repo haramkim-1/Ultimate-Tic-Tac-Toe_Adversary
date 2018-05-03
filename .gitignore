@@ -102,3 +102,10 @@ ENV/
 
 #others
 /EngineInterface/nb_old/
+log.txt
+out.txt
+err.txt
+ultimatetictactoe-engine/err.txt
+ultimatetictactoe-engine/out.txt
+EngineInterface/mypipe.lock
+EngineInterface/mypipe
