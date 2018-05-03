@@ -26,8 +26,8 @@ class Position:
         self.board[9*y+x] = pid
         
     def get_board(self):
-        return ''.join(self.board, ',')
+        return str.join(",", [str(i) for i in self.board])
 
     def get_macroboard(self):
-        return ''.join(self.macroboard, ',')
+        return str.join(",", [str(i) for i in self.macroboard])
     

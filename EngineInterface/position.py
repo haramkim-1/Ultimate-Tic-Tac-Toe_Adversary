@@ -14,7 +14,7 @@ class Position:
         self.macroboard = [ int(f) for f in mblist ]
     
     def is_legal(self, x, y):
-        mbx, mby = x/3, y/3
+        mbx, mby = x//3, y//3
         return self.macroboard[3*mby+mbx] == -1 and self.board[9*y+x] == 0
 
     def legal_moves(self):
@@ -26,7 +26,7 @@ class Position:
         self.board[9*y+x] = pid
         
     def get_board(self):
-        return ''.join((self.board, ','))
+        return str.join(",", [str(i) for i in self.board])
 
     def get_macroboard(self):
-        return ''.join((self.macroboard, ','))
+        return str.join(",", [str(i) for i in self.macroboard])
