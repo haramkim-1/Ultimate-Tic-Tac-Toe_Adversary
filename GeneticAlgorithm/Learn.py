@@ -32,9 +32,11 @@ class EngineConnector:
         pipe.close()
 
         #run engine
-        ibot_launch_str = "python ../EngineInterface/main.py " + os.path.abspath(self.interface_pipe_path)
-        engine_launch_str = "TODO"
-        self.engine_process = subprocess.Popen(engine_launch_str, shell=True)
+        otherbot_launch_str = "python3 .."+ os.sep +"tictactoe-starterbot-python3"+ os.sep +"main.py" #TODO: replace with dynamic
+
+        ibot_launch_str = "python3 .."+ os.sep +"EngineInterface"+ os.sep +"main.py " + os.path.abspath(self.interface_pipe_path)
+        engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ otherbot_launch_str +"\" \"" + ibot_launch_str + "\" 2>.."+ os.sep +"err.txt 1>.."+ os.sep +"out.txt"
+        self.engine_process = subprocess.Popen(engine_launch_str, shell=True, cwd=".."+ os.sep +"ultimatetictactoe-engine")
 
     def read_move(self):
         recieved = ""
