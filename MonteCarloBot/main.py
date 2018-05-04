@@ -1,4 +1,4 @@
-
+from montecarlobot import MonteCarloBot
 def parse_command(instr, bot, pos):
     if instr.startswith('action move'):
         time = int(instr.split(' ')[-1])
@@ -25,10 +25,9 @@ def parse_command(instr, bot, pos):
 if __name__ == '__main__':
     import sys
     from position import Position
-    from randombot import RandomBot
 
     pos = Position()
-    bot = RandomBot()
+    bot = MonteCarloBot()
     
     while True:
         try:
