@@ -48,8 +48,8 @@ class MonteCarloBot:
         weights = []*l
         total = 0
         for i in range(0,l):
-            weights[i] = node.moves[i].wins[turn]
-            total = total + node.trials 
+            weights[i] = node.moves[i].wins[turn]/node.moves[i].trials
+            total = total + weights[i]
         weights = [i/total for i in weights]
         for i in range(1,l):
             weights[i] = weights[i] + weights[i-1]
