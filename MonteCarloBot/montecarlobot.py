@@ -5,11 +5,10 @@ import bisect
 
 class Node:
     moves = {}
-    wins = []
+    wins = {}
     trials = -1
 
-    def __init__(self, wins, trials):
-        self.wins = wins
+    def __init__(self, trials):
         self.trials = trials
 
 class Victory(Enum):
@@ -17,20 +16,16 @@ class Victory(Enum):
     LOSE = -1
     DRAW = 0
 
-class Turn(Enum):
-    MINE = 0
-    ENEMY = 1
-
-    def other(self):
-        if self == Turn.ENEMY:
-            return Turn.MINE
-        else:
-            return Turn.ENEMY
-
 class MonteCarloBot:
 
     myid = -1
     oppid = -1
+
+    def other_player(self, pid):
+        if pid == self.myid:
+            return self.oppid
+        else:
+            return self.myid
 
     def monte_carlo_iter(self, pos, node, turn):
         vic = pos.check_victory()
@@ -44,7 +39,9 @@ class MonteCarloBot:
         l = len(moves)
         if not node.moves:
             for i in moves:
-                node.moves[i] = Node([1,1], l)
+                node.moves[i] = Node(2)
+                node.wins[self.myid] = 1
+                node.wins[self.oppid] = 1
         weights = []*l
         total = 0
         for i in range(0,l):
@@ -58,18 +55,18 @@ class MonteCarloBot:
         result = self.monte_carlo_iter(pos.make_move(moves[choice], turn), node.moves[moves[choice]], turn.other())
         node.trials = node.trials + 1
         if result == Victory.WIN:
-            node.wins[Turn.ENEMY] = node.wins[Turn.ENEMY] + 1
+            node.wins[self.oppid] = node.wins[self.oppid] + 1
             return Victory.LOSE
         elif result == Victory.LOSE:
-            node.wins[Turn.MINE] = node.wins[Turn.MINE] + 1
+            node.wins[self.myid] = node.wins[self.myid] + 1
             return Victory.LOSE
         else:
             return Victory.DRAW
 
     def monte_carlo(self, pos, iterations):
-        root = Node([1,1],2)
+        root = Node(2)
         for i in range(0,iterations):
-            self.monte_carlo_iter(copy.deepcopy(pos), root, Turn.MINE)
+            self.monte_carlo_iter(copy.deepcopy(pos), root, self.myid)
         max = 0
         for (move, node) in (root.moves).items():
             if node.wins/node.trials > max:
@@ -79,5 +76,3 @@ class MonteCarloBot:
 
     def get_move(self, pos, tleft):
         return self.monte_carlo(pos, 10000)
-
-
