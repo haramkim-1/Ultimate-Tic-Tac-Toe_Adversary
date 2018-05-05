@@ -28,7 +28,7 @@ class MonteCarloBot:
             return self.myid
 
     def monte_carlo_iter(self, pos, node, turn):
-        vic = pos.check_victory()
+        vic = pos.checkMacroboardWinner()
         if vic == self.myid:
             return Victory.WIN
         elif vic == self.oppid:

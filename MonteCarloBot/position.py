@@ -4,7 +4,6 @@ class Position:
     def __init__(self):
         self.board = []
         self.macroboard = []
-        self.mMacroboard = [[]]
         self.mLastX = -1
         self.mLastY = -1
     
@@ -18,15 +17,15 @@ class Position:
     
     def is_legal(self, x, y):
         mbx, mby = x//3, y//3
-        return self.macroboard[3*mby+mbx] == -1 and self.board[9*y+x] == 0
+        return self.macroboard[3*mbx+mby] == -1 and self.board[9*x+y] == 0
 
     def legal_moves(self):
         return [ (x, y) for x in range(9) for y in range(9) if self.is_legal(x, y) ]
         
     def make_move(self, x, y, pid):
-        mbx, mby = x//3, y//3
-        self.macroboard[3*mby+mbx] = -1
-        self.board[9*y+x] = pid
+        self.mLastX, self.mLastY = x, y
+        self.board[9*x+y] = pid
+        self.updateMacroboard()
         
     def get_board(self):
         return str.join(",", [str(i) for i in self.board])
@@ -38,7 +37,7 @@ class Position:
     def microboardFull(self, x, y):
         if x < 0 or y < 0:
             return True
-        if (self.mMacroboard[x][y] == 1 or self.mMacroboard[x][y] == 2):
+        if (self.macroboard[x*3+y] == 1 or self.macroboard[x*3+y] == 2):
             return True
         for my in range(y*3, y*3+3):
             for mx in range(x*3, x*3+3):
@@ -50,14 +49,14 @@ class Position:
         for x in range(0, 3):
             for y in range(0, 3):
                 winner = self.getMicroboardWinner(x, y)
-                self.mMacroboard[x][y] = winner
+                self.macroboard[x*3+y] = winner
         if (not self.microboardFull(self.mLastX%3, self.mLastY%3)):
-            self.mMacroboard[self.mLastX%3][self.mLastY%3] = -1
+            self.macroboard[self.mLastX%3*3+self.mLastY%3] = -1
         else:
             for x in range(0, 3):
                 for y in range(0, 3):
                     if (not self.microboardFull(x, y)):
-                        self.mMacroboard[x][y] = -1
+                        self.macroboard[x*3+y] = -1
 
     def getMicroboardWinner(self, macroX, macroY):
         startX = macroX*3
@@ -76,13 +75,13 @@ class Position:
 
     def checkMacroboardWinner(self):
         for y in range(0, 3):
-            if (self.mMacroboard[0][y] == self.mMacroboard[1][y] and self.mMacroboard[1][y] == self.mMacroboard[2][y] and self.mMacroboard[0][y] > 0):
-                return self.mMacroboard[0][y]
+            if (self.macroboard[y] == self.macroboard[1*3+y] and self.macroboard[1*3+y] == self.macroboard[2*3+y] and self.macroboard[0*3+y] > 0):
+                return self.macroboard[0*3+y]
         for x in range(0, 3):
-            if (self.mMacroboard[x][0] == self.mMacroboard[x][1] and self.mMacroboard[x][1] == self.mMacroboard[x][2] and self.mMacroboard[x][0] > 0):
-                return self.mMacroboard[x][0]
-        if (self.mMacroboard[0][0] == self.mMacroboard[1][1] and self.mMacroboard[1][1] == self.mMacroboard[2][2] and self.mMacroboard[0][0] > 0):
-            return self.mMacroboard[0][0]
-        if (self.mMacroboard[2][0] == self.mMacroboard[1][1] and self.mMacroboard[1][1] == self.mMacroboard[0][2] and self.mMacroboard[2][0] > 0):
-            return self.mMacroboard[2][0]
+            if (self.macroboard[x*3+0] == self.macroboard[x*3+1] and self.macroboard[x*3+1] == self.macroboard[x*3+2] and self.macroboard[x*3+0] > 0):
+                return self.macroboard[x*3+0]
+        if (self.macroboard[0*3+0] == self.macroboard[1*3+1] and self.macroboard[1*3+1] == self.macroboard[2*3+2] and self.macroboard[0*3+0] > 0):
+            return self.macroboard[0*3+0]
+        if (self.macroboard[2*3+0] == self.macroboard[1*3+1] and self.macroboard[1*3+1] == self.macroboard[0*3+2] and self.macroboard[2*3+0] > 0):
+            return self.macroboard[2*3+0]
         return 0
