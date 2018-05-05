@@ -3,21 +3,29 @@ import time
 
 training_bots = []
 
+def eval_genome(genome, config):
+    net = neat.nn.FeedForwardNetwork.create(genome, config)
+    cumulative_fitness = 0
+    for bot in training_bots:
+        result = play_game(net, bot)
+        cumulative_fitness = cumulative_fitness #+ fitness(result)
+    genome.fitness  = cumulative_fitness / len(training_bots)
+
 #play game with net being the net we are testing and bot the AI we are testing against
-def play_game(net, bot):
+def play_game(net, bot_path):
+    connection = EngineConnector(bot_path)
     raise NotImplementedError
 
-def eval_genomes(genomes, config):
-    for genome_id, genome in genomes:
-        net = neat.nn.FeedForwardNetwork.create(genome, config)
-        cumulative_fitness = 0
-        for bot in training_bots:
-            result = play_game(net, bot)
-            cumulative_fitness = cumulative_fitness #+ fitness(result)
-        genome.fitness  = cumulative_fitness / len(training_bots)
+# TODO: will extract new move
+def check_move_legal(state, move):
+    raise NotImplementedError
+
+# TODO: should return a move in the form (x,y)
+def get_move_from_net(net, state):
+    raise NotImplementedError
 
 class EngineConnector:
-    def __init__(self, bot_start_cms):
+    def __init__(self, otherbot_path):
         import uuid
         import subprocess
         import os
@@ -32,13 +40,14 @@ class EngineConnector:
         pipe.close()
 
         #run engine
-        otherbot_launch_str = "python3 .."+ os.sep +"tictactoe-starterbot-python3"+ os.sep +"main.py" #TODO: replace with dynamic
+        otherbot_launch_str = "python3 .."+ os.sep + otherbot_path + os.sep +"main.py"
 
         ibot_launch_str = "python3 .."+ os.sep +"EngineInterface"+ os.sep +"main.py " + os.path.abspath(self.interface_pipe_path)
         engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ otherbot_launch_str +"\" \"" + ibot_launch_str + "\" 2>.."+ os.sep +"err.txt 1>.."+ os.sep +"out.txt"
+        print("launchstr: " + engine_launch_str)
         self.engine_process = subprocess.Popen(engine_launch_str, shell=True, cwd=".."+ os.sep +"ultimatetictactoe-engine")
 
-    def read_move(self):
+    def read_state(self):
         recieved = ""
         received_selection = False
         while (not received_selection):
