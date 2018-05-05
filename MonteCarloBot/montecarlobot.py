@@ -31,11 +31,6 @@ class MonteCarloBot:
 
     myid = -1
     oppid = -1
-    
-    def get_move(self, pos, tleft):
-        lmoves = pos.legal_moves()
-        rm = 0#randint(0, len(lmoves)-1)
-        return lmoves[rm]
 
     def monte_carlo_iter(self, pos, node, turn):
         vic = pos.check_victory()
@@ -60,7 +55,7 @@ class MonteCarloBot:
             weights[i] = weights[i] + weights[i-1]
         num = random.random()
         choice = bisect.bisect(weights, num)
-        result = self.monte_carlo_iter(pos.make_move(moves[choice]), node.moves[moves[choice]], turn.other())
+        result = self.monte_carlo_iter(pos.make_move(moves[choice], turn), node.moves[moves[choice]], turn.other())
         node.trials = node.trials + 1
         if result == Victory.WIN:
             node.wins[Turn.ENEMY] = node.wins[Turn.ENEMY] + 1
@@ -72,6 +67,17 @@ class MonteCarloBot:
             return Victory.DRAW
 
     def monte_carlo(self, pos, iterations):
-        cur_pos = copy.deepcopy(pos)
+        root = Node([1,1],2)
+        for i in range(0,iterations):
+            self.monte_carlo_iter(copy.deepcopy(pos), root, Turn.MINE)
+        max = 0
+        for (move, node) in (root.moves).items():
+            if node.wins/node.trials > max:
+                max = node.wins/node.trials
+                argmax = move
+        return argmax
+
+    def get_move(self, pos, tleft):
+        return self.monte_carlo(pos, 10000)
 
 
