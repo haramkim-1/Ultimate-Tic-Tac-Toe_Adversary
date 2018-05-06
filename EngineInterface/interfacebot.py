@@ -53,5 +53,5 @@ class InterfaceBot:
 
         self.log.write("\nmove:\n" + received + "\n")
         #return the selected move from lmoves
-        lmoves_strings = [str for x in lmoves]
+        lmoves_strings = [str(x) for x in lmoves]
         lmoves[lmoves_strings.index(received)]
