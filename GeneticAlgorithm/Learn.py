@@ -51,7 +51,7 @@ def play_game(net, bot_path, is_first):
         connection.send_move(str(move))
         num_turns += 1
         win_status = connection.win_status()
-    connecton.close()
+    connection.close()
     return win_status, num_turns
 
 # will extract new move
