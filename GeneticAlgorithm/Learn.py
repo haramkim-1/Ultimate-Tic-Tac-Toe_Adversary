@@ -1,22 +1,43 @@
 import neat
 import time
+import os
 
-training_bots = []
+training_bots = ["tictactoe-starterbot-python3"]
+
+def eval_genomes(genomes, config):
+    for genome_id, genome in genomes:
+        eval_genome(genome, config)
 
 def eval_genome(genome, config):
     net = neat.nn.FeedForwardNetwork.create(genome, config)
+    num_reps = 20
     cumulative_fitness = 0
     for bot in training_bots:
-        result = play_game(net, bot)
-        cumulative_fitness = cumulative_fitness + fitness(result)
-    genome.fitness  = cumulative_fitness / len(training_bots)
+        for _ in range(num_reps):
+            result = play_game(net, bot, False)
+            cumulative_fitness = cumulative_fitness + fitness(result, False)
+    genome.fitness  = cumulative_fitness / len(training_bots * cumulative_fitness)
 
-def fitness(game_res):
-    raise NotImplementedError
+def fitness(game_res, is_first):
+    #cases based on win status
+    if game_res[0] == 0:
+        return 0
+    elif game_res[0] == 1: #player 1 wins
+        if is_first:
+            return 1
+        else:
+            return 0
+    elif game_res[0] == 2: #player 2 wins
+        if is_first:
+            return 0
+        else:
+            return 1
+    else:
+        return 0
 
 #play game with net being the net we are testing and bot the AI we are testing against
-def play_game(net, bot_path):
-    connection = EngineConnector(bot_path, False)
+def play_game(net, bot_path, is_first):
+    connection = EngineConnector(bot_path, is_first)
     win_status = connection.win_status()
     num_turns = 0
     # while win condition hasn't been met, loop
@@ -31,11 +52,11 @@ def play_game(net, bot_path):
         win_status = connection.win_status()
     return win_status, num_turns
 
-# TODO: will extract new move
+# will extract new move
 def check_move_legal(moves_str, move):
     return str(move) in moves_str
 
-# TODO: should return a move in the form (x,y)
+# should return a move in the form (x,y)
 def get_move_from_net(net, state):
     board_state = state[0]
     macroboard_state = state[1]
@@ -85,9 +106,8 @@ class EngineConnector:
     def __init__(self, otherbot_path, is_first):
         import uuid
         import subprocess
-        import os
         from filelock import FileLock
-        self.str_uuid = str(uuid.uuid1)
+        self.str_uuid = str(uuid.uuid1())
         self.interface_pipe_path = self.str_uuid + "_pipe"
         self.interface_lock_path = self.str_uuid + "_pipe.lock"
         self.lock = FileLock(self.interface_lock_path)
@@ -102,9 +122,9 @@ class EngineConnector:
         ibot_launch_str = "python3 .."+ os.sep +"EngineInterface"+ os.sep +"main.py " + os.path.abspath(self.interface_pipe_path)
 
         if is_first:
-            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ ibot_launch_str +"\" \"" + otherbot_launch_str
+            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ ibot_launch_str +"\" \"" + otherbot_launch_str + "\""
         else:
-            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ otherbot_launch_str +"\" \"" + ibot_launch_str
+            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ otherbot_launch_str +"\" \"" + ibot_launch_str + "\""
 
         print("launchstr: " + engine_launch_str)
         self.engine_process = subprocess.Popen(engine_launch_str, shell=True, stdout=subprocess.PIPE, cwd=".."+ os.sep +"ultimatetictactoe-engine")
@@ -158,3 +178,40 @@ class EngineConnector:
                 return 2
             l = self.engine_process.stdout.readline()
         return -1
+
+def run(config_file):
+    # Load configuration.
+    config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                         neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                         config_file)
+
+    # Create the population, which is the top-level object for a NEAT run.
+    p = neat.Population(config)
+
+    # Add a stdout reporter to show progress in the terminal.
+    p.add_reporter(neat.StdOutReporter(True))
+    stats = neat.StatisticsReporter()
+    p.add_reporter(stats)
+
+    checkpointer = neat.Checkpointer(generation_interval=1000)
+    p.add_reporter(checkpointer)
+
+    # Run for up to 300 generations.
+    pe = neat.ParallelEvaluator(4, eval_genome)
+    #winner = p.run(pe.evaluate, 10000)
+    winner = p.run(eval_genomes, 10000)
+
+    # Display the winning genome.
+    print('\nBest genome:\n{!s}'.format(winner))
+
+    # write the most fit nn
+    #winner_net = neat.nn.FeedForwardNetwork.create(winner, config)
+    #checkpointer.save_checkpoint(config, p, checkpointer.current_generation)
+
+if __name__ == '__main__':
+    # Determine path to configuration file. This path manipulation is
+    # here so that the script will run successfully regardless of the
+    # current working directory.
+    local_dir = os.path.dirname(__file__)
+    config_path = os.path.join(local_dir, 'config-feedforward')
+    run(config_path)
