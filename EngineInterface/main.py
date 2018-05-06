@@ -36,7 +36,13 @@ if __name__ == '__main__':
     interface_lock_path = prefix + '.lock'
     lock = FileLock(interface_lock_path)
 
-    log = open(".." + os.sep + prefix + "_ibot_log.txt", "w+")
+    log_path = ".."+ os.sep +"ibot_log.txt"
+    if os.path.exists(log_path):
+        os.remove(log_path)
+
+    #log = open(".." + os.sep + prefix + "_ibot_log.txt", "w+")
+    log = open(log_path, "w+")
+    #log = open("../" + str(uuid.uuid1()) + "_ibot_log.txt", "w+")
 
     pos = Position()
     bot = InterfaceBot(interface_pipe_path, interface_lock_path, lock, log)
@@ -54,4 +60,5 @@ if __name__ == '__main__':
         log.write(str(e) + "\n")
         log.write(str(traceback.format_exc()))
         log.flush()
+        log.close()
             

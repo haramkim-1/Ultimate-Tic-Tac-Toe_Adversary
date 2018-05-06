@@ -21,7 +21,7 @@ class InterfaceBot:
             pipe.write(to_write)
             pipe.close()
 
-            self.log.write(to_write + "\n")
+            self.log.write("wrote:\n"+to_write+"\n")
             self.log.flush()
         finally:
             self.lock.release()
@@ -48,6 +48,8 @@ class InterfaceBot:
 
             #sleep for a duration to give time for selection to be made
             time.sleep(0.001)
+
+        self.log.write("\nmove:\n" + received + "\n")
         #return the selected move from lmoves
         lmoves_strings = [str for x in lmoves]
         lmoves[lmoves_strings.index(received)]

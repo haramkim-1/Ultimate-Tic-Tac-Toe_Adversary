@@ -110,8 +110,8 @@ class EngineConnector:
         import subprocess
         from filelock import FileLock
         self.str_uuid = str(uuid.uuid1())
-        self.interface_pipe_path = self.str_uuid + "_pipe"
-        self.interface_lock_path = self.str_uuid + "_pipe.lock"
+        self.interface_pipe_path = self.str_uuid + ".pipe"
+        self.interface_lock_path = self.str_uuid + ".pipe.lock"
         self.lock = FileLock(self.interface_lock_path)
         self.is_first = is_first
 
@@ -183,6 +183,8 @@ class EngineConnector:
 
     def close(self):
         os.remove(self.interface_pipe_path)
+        if os.path.exists(self.interface_lock_path):
+            os.remove(self.interface_lock_path)
 
 def run(config_file):
     # Load configuration.
