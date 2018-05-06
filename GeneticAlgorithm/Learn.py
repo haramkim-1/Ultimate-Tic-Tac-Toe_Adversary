@@ -23,7 +23,7 @@ def play_game(net, bot_path):
         # read state of game
         state = connection.read_state()
         # get move from net
-        move = get_move_from_net(net, state[0], state[1])
+        move = get_move_from_net(net, state[0])
         # send the move
         connection.send_move(str(move))
         win_status = connection.win_status()
@@ -34,7 +34,9 @@ def check_move_legal(moves_str, move):
     return str(move) in moves_str
 
 # TODO: should return a move in the form (x,y)
-def get_move_from_net(net, board_state, macroboard_state):
+def get_move_from_net(net, state):
+    board_state = state[0]
+    macroboard_state = state[1]
     board_moves = board_state.split(",")
     nn_input = []*198
     for i in range(0,81):
@@ -73,7 +75,7 @@ def get_move_from_net(net, board_state, macroboard_state):
     moves = range(0,81)
     moves = sorted(moves, key=lambda x:nn_output[x], reverse=True)
     for i in range(0,81):
-        if check_move_legal(board_state, macroboard_state, (moves[i]%9, moves[i]//9)):
+        if check_move_legal(state[3], (moves[i]%9, moves[i]//9)):
             return (moves[i]%9, moves[i]//9)
     assert False
 
