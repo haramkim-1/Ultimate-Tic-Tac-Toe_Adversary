@@ -6,6 +6,9 @@ class Position:
         self.macroboard = []
         self.mLastX = -1
         self.mLastY = -1
+
+    def __str__(self):
+        return ",".join(map(lambda x:str(x),self.board))
     
     def parse_field(self, fstr):
         flist = fstr.replace(';', ',').split(',')
@@ -22,8 +25,9 @@ class Position:
     def legal_moves(self):
         return [ (x, y) for x in range(9) for y in range(9) if self.is_legal(x, y) ]
         
-    def make_move(self, x, y, pid):
-        self.mLastX, self.mLastY = x, y
+    def make_move(self, move, pid):
+        x, y = move
+        self.mLastX, self.mLastY = move
         self.board[9*x+y] = pid
         self.updateMacroboard()
         

@@ -29,6 +29,7 @@ class MonteCarloBot:
 
     def monte_carlo_iter(self, pos, node, turn):
         vic = pos.checkMacroboardWinner()
+        print(pos)
         if vic == self.myid:
             return Victory.WIN
         elif vic == self.oppid:
@@ -42,17 +43,19 @@ class MonteCarloBot:
                 node.moves[i] = Node(2)
                 node.wins[self.myid] = 1
                 node.wins[self.oppid] = 1
-        weights = []*l
+        weights = [0]*l
         total = 0
         for i in range(0,l):
-            weights[i] = node.moves[i].wins[turn]/node.moves[i].trials
+            m = node.moves[moves[i]]
+            weights[i] = m.wins[turn]/m.trials
             total = total + weights[i]
         weights = [i/total for i in weights]
         for i in range(1,l):
             weights[i] = weights[i] + weights[i-1]
         num = random.random()
         choice = bisect.bisect(weights, num)
-        result = self.monte_carlo_iter(pos.make_move(moves[choice], turn), node.moves[moves[choice]], turn.other())
+        pos.make_move(moves[choice], turn)
+        result = self.monte_carlo_iter(pos, node.moves[moves[choice]], self.other_player(turn))
         node.trials = node.trials + 1
         if result == Victory.WIN:
             node.wins[self.oppid] = node.wins[self.oppid] + 1
