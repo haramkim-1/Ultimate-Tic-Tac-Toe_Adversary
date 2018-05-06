@@ -75,4 +75,4 @@ class MonteCarloBot:
         return argmax
 
     def get_move(self, pos, tleft):
-        return self.monte_carlo(pos, 10000)
+        return self.monte_carlo(pos, 1000)
