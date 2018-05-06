@@ -65,6 +65,8 @@ class MonteCarloBot:
 
     def monte_carlo(self, pos, iterations):
         root = Node(2)
+        root.wins[self.myid] = 1
+        root.wins[self.oppid] = 1
         for i in range(0,iterations):
             self.monte_carlo_iter(copy.deepcopy(pos), root, self.myid)
         max = 0
