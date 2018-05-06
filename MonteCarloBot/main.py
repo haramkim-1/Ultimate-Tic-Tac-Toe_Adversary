@@ -25,16 +25,26 @@ def parse_command(instr, bot, pos):
 if __name__ == '__main__':
     import sys
     from position import Position
+    import os
+    import traceback
+
+    log = open(".." + os.sep + "mc_log.txt", "w+")
 
     pos = Position()
     bot = MonteCarloBot()
     
-    while True:
-        try:
-            instr = input()
-        except Exception as e:
-            sys.stderr.write('error reading input')
-        outstr = parse_command(instr, bot, pos)
-        sys.stdout.write(outstr)
-        sys.stdout.flush()            
+    try:
+        while True:
+            try:
+                instr = input()
+            except Exception as e:
+                sys.stderr.write('error reading input')
+            outstr = parse_command(instr, bot, pos)
+            sys.stdout.write(outstr)
+            sys.stdout.flush()
+    except Exception as e:
+        log.write(str(e) + "\n")
+        log.write(str(traceback.format_exc()))
+        log.flush()
+        log.close()
             
