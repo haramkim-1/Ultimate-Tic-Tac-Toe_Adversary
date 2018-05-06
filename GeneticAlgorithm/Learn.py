@@ -11,9 +11,22 @@ def eval_genome(genome, config):
         cumulative_fitness = cumulative_fitness + fitness(result)
     genome.fitness  = cumulative_fitness / len(training_bots)
 
+# return true if a win condition has been met in the game, and false otherwise
+def win_condition_met(connection):
+    while True:
+        l = connection.stdout.readline()
+        if "Draw!" in l or :
+            return True
+
+
 #play game with net being the net we are testing and bot the AI we are testing against
 def play_game(net, bot_path):
     connection = EngineConnector(bot_path, False)
+
+    # while win condition hasn't been met, loop
+    # read state of game
+    # get move from net
+    # send the move
     raise NotImplementedError
 
 # TODO: will extract new move
@@ -36,7 +49,7 @@ class EngineConnector:
         self.interface_lock_path = self.str_uuid + "_pipe.lock"
         self.lock = FileLock(self.interface_lock_path)
         self.is_first = is_first
-        
+
         #create pipe file if it does not exist
         pipe = open(self.interface_pipe_path, "w+")
         pipe.close()
@@ -49,7 +62,7 @@ class EngineConnector:
             engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ ibot_launch_str +"\" \"" + otherbot_launch_str + "\" 2>.."+ os.sep +"err.txt 1>.."+ os.sep +"out.txt"
         else:
             engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ otherbot_launch_str +"\" \"" + ibot_launch_str + "\" 2>.."+ os.sep +"err.txt 1>.."+ os.sep +"out.txt"
-            
+
         print("launchstr: " + engine_launch_str)
         self.engine_process = subprocess.Popen(engine_launch_str, shell=True, cwd=".."+ os.sep +"ultimatetictactoe-engine")
 
@@ -84,7 +97,7 @@ class EngineConnector:
         try:
             pipe = open(self.interface_pipe_path, "w+")
             pipe.write("move\n")
-            pipe.write(selection)    
+            pipe.write(selection)
             pipe.close()
         finally:
             self.lock.release()
