@@ -8,7 +8,7 @@ def eval_genome(genome, config):
     cumulative_fitness = 0
     for bot in training_bots:
         result = play_game(net, bot)
-        cumulative_fitness = cumulative_fitness #+ fitness(result)
+        cumulative_fitness = cumulative_fitness + fitness(result)
     genome.fitness  = cumulative_fitness / len(training_bots)
 
 #play game with net being the net we are testing and bot the AI we are testing against
@@ -17,7 +17,8 @@ def play_game(net, bot_path):
     raise NotImplementedError
 
 # TODO: will extract new move
-def check_move_legal(state, move):
+def check_move_legal(moves_str, move):
+
     raise NotImplementedError
 
 # TODO: should return a move in the form (x,y)
