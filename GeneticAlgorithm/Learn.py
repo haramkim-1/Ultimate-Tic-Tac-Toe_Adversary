@@ -28,7 +28,7 @@ def play_game(net, bot_path):
 
 # TODO: will extract new move
 def check_move_legal(moves_str, move):
-    return move in moves_str
+    return str(move) in moves_str
 
 # TODO: should return a move in the form (x,y)
 def get_move_from_net(net, board_state, macroboard_state):
