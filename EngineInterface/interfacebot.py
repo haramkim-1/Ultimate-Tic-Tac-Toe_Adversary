@@ -28,6 +28,7 @@ class InterfaceBot:
 
         #result read phase; must check that result has been written
         received_selection = False
+        received = ""
         while (not received_selection):
             #try to read selection
             self.lock.acquire()
@@ -38,15 +39,15 @@ class InterfaceBot:
                 first_line = pipe.readline()
                 if ("move" in first_line):
                     received_selection = True
-
-                    #TODO: read from file
-                    input("wait for input")
+                    received = pipe.readline()
+                    received = received.strip()
                     pipe.close()
-                    return lmoves[0]
-
                 pipe.close()
             finally:
                 self.lock.release()
 
             #sleep for a duration to give time for selection to be made
             time.sleep(0.001)
+        #return the selected move from lmoves
+        lmoves_strings = [str for x in lmoves]
+        lmoves[lmoves_strings.index(received)]
