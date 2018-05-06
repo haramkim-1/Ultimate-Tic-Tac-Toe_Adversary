@@ -152,7 +152,6 @@ class EngineConnector:
                 if (expected in first_line):
                     received_selection = True
                     received = pipe.read()
-                    print(received) #TODO: Remove this line
                     pipe.close()
                 pipe.close()
             finally:
@@ -162,7 +161,7 @@ class EngineConnector:
 
         #process received into a tuple of board, macroboard, moves
         lines = received.splitlines(keepends=False)
-        print("state: " + str((lines[1], lines[3], lines[5])))
+        #print("state: " + str((lines[1], lines[3], lines[5])))
         return (lines[1], lines[3], lines[5])
 
     def send_move(self, selection):
