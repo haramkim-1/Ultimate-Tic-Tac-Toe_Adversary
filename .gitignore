@@ -109,3 +109,8 @@ ultimatetictactoe-engine/err.txt
 ultimatetictactoe-engine/out.txt
 EngineInterface/mypipe.lock
 EngineInterface/mypipe
+run_engine.sh
+GeneticAlgorithm/mypipe
+GeneticAlgorithm/mypipe.lock
+rb_err.txt
+rb_out.txt

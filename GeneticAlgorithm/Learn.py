@@ -13,11 +13,11 @@ def eval_genome(genome, config):
 
 # return true if a win condition has been met in the game, and false otherwise
 def win_condition_met(connection):
-    while True:
-        l = connection.stdout.readline()
-        if "Draw!" in l or :
-            return True
-
+    raise NotImplementedError
+    # while True:
+    #     l = connection.stdout.readline()
+    #     if "Draw!" in l or :
+    #         return True
 
 #play game with net being the net we are testing and bot the AI we are testing against
 def play_game(net, bot_path):
@@ -59,12 +59,12 @@ class EngineConnector:
         ibot_launch_str = "python3 .."+ os.sep +"EngineInterface"+ os.sep +"main.py " + os.path.abspath(self.interface_pipe_path)
 
         if is_first:
-            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ ibot_launch_str +"\" \"" + otherbot_launch_str + "\" 2>.."+ os.sep +"err.txt 1>.."+ os.sep +"out.txt"
+            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ ibot_launch_str +"\" \"" + otherbot_launch_str
         else:
-            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ otherbot_launch_str +"\" \"" + ibot_launch_str + "\" 2>.."+ os.sep +"err.txt 1>.."+ os.sep +"out.txt"
+            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ otherbot_launch_str +"\" \"" + ibot_launch_str
 
         print("launchstr: " + engine_launch_str)
-        self.engine_process = subprocess.Popen(engine_launch_str, shell=True, cwd=".."+ os.sep +"ultimatetictactoe-engine")
+        self.engine_process = subprocess.Popen(engine_launch_str, shell=True, stdout=subprocess.PIPE, cwd=".."+ os.sep +"ultimatetictactoe-engine")
 
     def read_state(self):
         recieved = ""
@@ -90,6 +90,7 @@ class EngineConnector:
 
         #process recieved into a tuple of board, macroboard, moves
         lines = recieved.splitlines(keepends=False)
+        print("state: " + str((lines[2], lines[4], lines[6])))
         return (lines[2], lines[4], lines[6])
 
     def send_move(self, selection):
