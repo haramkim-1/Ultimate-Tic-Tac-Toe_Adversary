@@ -11,6 +11,9 @@ def eval_genome(genome, config):
         cumulative_fitness = cumulative_fitness + fitness(result)
     genome.fitness  = cumulative_fitness / len(training_bots)
 
+def fitness(game_res):
+    raise NotImplementedError
+
 #play game with net being the net we are testing and bot the AI we are testing against
 def play_game(net, bot_path):
     connection = EngineConnector(bot_path, False)
@@ -20,7 +23,7 @@ def play_game(net, bot_path):
         # read state of game
         state = connection.read_state()
         # get move from net
-        move = get_move_from_net(net, state)
+        move = get_move_from_net(net, state[0], state[1])
         # send the move
         connection.send_move(str(move))
         win_status = connection.win_status()
