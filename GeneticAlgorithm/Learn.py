@@ -18,6 +18,7 @@ def fitness(game_res):
 def play_game(net, bot_path):
     connection = EngineConnector(bot_path, False)
     win_status = connection.win_status()
+    num_turns = 0
     # while win condition hasn't been met, loop
     while (win_status == -1):
         # read state of game
@@ -26,8 +27,9 @@ def play_game(net, bot_path):
         move = get_move_from_net(net, state[0], state[1])
         # send the move
         connection.send_move(str(move))
+        num_turns += 1
         win_status = connection.win_status()
-    return win_status
+    return win_status, num_turns
 
 # TODO: will extract new move
 def check_move_legal(moves_str, move):
