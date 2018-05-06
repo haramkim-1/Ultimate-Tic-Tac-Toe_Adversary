@@ -46,7 +46,13 @@ def play_game(net, bot_path, is_first):
         # read state of game
         state = connection.read_state()
         # get move from net
-        move = get_move_from_net(net, state[0])
+        #move = get_move_from_net(net, state[0])
+        
+        #TODO: REMOVE temporary auto-select 1st legal move
+        import ast
+        move = ast.literal_eval(state[2])[0]
+        raise Exception(str(move))
+
         # send the move
         connection.send_move(str(move))
         num_turns += 1
@@ -110,8 +116,8 @@ class EngineConnector:
         import subprocess
         from filelock import FileLock
         self.str_uuid = str(uuid.uuid1())
-        self.interface_pipe_path = self.str_uuid + ".pipe"
-        self.interface_lock_path = self.str_uuid + ".pipe.lock"
+        self.interface_pipe_path = "pipes/" + self.str_uuid + ".pipe"
+        self.interface_lock_path = self.interface_pipe_path + ".lock"
         self.lock = FileLock(self.interface_lock_path)
         self.is_first = is_first
 
@@ -132,6 +138,7 @@ class EngineConnector:
         self.engine_process = subprocess.Popen(engine_launch_str, shell=True, stdout=subprocess.PIPE, cwd=".."+ os.sep +"ultimatetictactoe-engine")
 
     def read_state(self):
+        raise Exception ("entered read_State")
         received = ""
         received_selection = False
         while (not received_selection):
@@ -221,4 +228,6 @@ if __name__ == '__main__':
     # current working directory.
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, 'config-feedforward')
+    if not os.path.exists("pipes" + os.sep):
+        os.makedirs("pipes" + os.sep)
     run(config_path)

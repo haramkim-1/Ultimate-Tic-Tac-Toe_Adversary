@@ -27,6 +27,8 @@ class InterfaceBot:
             self.lock.release()
 
         #result read phase; must check that result has been written
+        self.log.write("\nwaiting for response...\n\n")
+        self.log.flush()
         received_selection = False
         received = ""
         while (not received_selection):
