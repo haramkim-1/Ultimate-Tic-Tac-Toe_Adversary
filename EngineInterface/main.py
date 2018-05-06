@@ -1,3 +1,9 @@
+import sys
+import uuid
+from filelock import FileLock
+from position import Position
+from interfacebot import InterfaceBot
+import os
 import traceback
 
 def parse_command(instr, bot, pos):
@@ -24,13 +30,6 @@ def parse_command(instr, bot, pos):
     return ''
 
 if __name__ == '__main__':
-    import sys
-    import uuid
-    from filelock import FileLock
-    from position import Position
-    from interfacebot import InterfaceBot
-    import os
-
     prefix = sys.argv[1]
     interface_pipe_path = prefix
     interface_lock_path = prefix + '.lock'
