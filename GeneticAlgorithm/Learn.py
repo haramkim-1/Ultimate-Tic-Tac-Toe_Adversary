@@ -1,6 +1,7 @@
 import neat
 import time
 import os
+import sys
 
 training_bots = ["tictactoe-starterbot-python3"]
 
@@ -50,6 +51,7 @@ def play_game(net, bot_path, is_first):
         connection.send_move(str(move))
         num_turns += 1
         win_status = connection.win_status()
+    connecton.close()
     return win_status, num_turns
 
 # will extract new move
@@ -168,7 +170,7 @@ class EngineConnector:
 
     # return 0 if draw, 1 if player 1 wins, 2 if player 2 wins, -1 if active game
     def win_status(self):
-        l = self.engine_process.stdout.readline()
+        l = self.engine_process.stdout.readline().decode(sys.getdefaultencoding())
         while l != '':
             if "Draw" in l:
                 return 0
@@ -176,8 +178,11 @@ class EngineConnector:
                 return 1
             if "winner: player2" in l:
                 return 2
-            l = self.engine_process.stdout.readline()
+            l = self.engine_process.stdout.readline().decode(sys.getdefaultencoding())
         return -1
+
+    def close(self):
+        os.remove(self.interface_pipe_path)
 
 def run(config_file):
     # Load configuration.
