@@ -31,8 +31,48 @@ def check_move_legal(moves_str, move):
     return move in moves_str
 
 # TODO: should return a move in the form (x,y)
-def get_move_from_net(net, state):
-    raise NotImplementedError
+def get_move_from_net(net, board_state, macroboard_state):
+    board_moves = board_state.split(",")
+    nn_input = []*198
+    for i in range(0,81):
+        if board_moves[i] == "y":
+            nn_input[i] = 0
+            nn_input[i+81] = 1
+        elif board_moves[i] == "m":
+            nn_input[i] = 1
+            nn_input[i+81] = 0
+        else:
+            nn_input[i] = 0
+            nn_input[i+81] = 0
+    mboard_s = macroboard_state.split(",")
+    for i in range(0,9):
+        if mboard_s[i] == "y":
+            nn_input[162+i] = 0
+            nn_input[162+9+i] = 1
+            nn_input[162+18+i] = 0
+            nn_input[162+27+i] = 0
+        elif mboard_s[i] == "m":
+            nn_input[162+i] = 1
+            nn_input[162+9+i] = 0
+            nn_input[162+18+i] = 0
+            nn_input[162+27+i] = 0
+        elif mboard_s[i] == "d":
+            nn_input[162+i] = 0
+            nn_input[162+9+i] = 0
+            nn_input[162+18+i] = 1
+            nn_input[162+27+i] = 0
+        else:
+            nn_input[162+i] = 0
+            nn_input[162+9+i] = 0
+            nn_input[162+18+i] = 0
+            nn_input[162+27+i] = 1
+    nn_output = net.activate(nn_input)
+    moves = range(0,81)
+    moves = sorted(moves, key=lambda x:nn_output[x], reverse=True)
+    for i in range(0,81):
+        if check_move_legal(board_state, macroboard_state, (moves[i]%9, moves[i]//9)):
+            return (moves[i]%9, moves[i]//9)
+    assert False
 
 class EngineConnector:
     def __init__(self, otherbot_path, is_first):
