@@ -44,7 +44,7 @@ if __name__ == '__main__':
     #log = open("../" + str(uuid.uuid1()) + "_ibot_log.txt", "w+")
 
     pos = Position()
-    bot = InterfaceBot(interface_pipe_path, interface_lock_path, lock, log)
+    bot = InterfaceBot(interface_pipe_path, lock, log)
 
     try:
         while True:

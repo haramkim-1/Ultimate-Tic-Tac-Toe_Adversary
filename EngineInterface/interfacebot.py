@@ -1,10 +1,11 @@
 
 class InterfaceBot:
 
-    def __init__(self, p_file, p_file_lock, lock, log):
+    def __init__(self, p_file, lock, log):
         self.pipe_path = p_file
         self.lock = lock
         
+        #logging
         self.log = log
         self.log.write(p_file + "\n")
         self.log.flush()
@@ -54,4 +55,4 @@ class InterfaceBot:
         self.log.write("\nmove:\n" + received + "\n")
         #return the selected move from lmoves
         lmoves_strings = [str(x) for x in lmoves]
-        lmoves[lmoves_strings.index(received)]
+        return lmoves[lmoves_strings.index(received)]
