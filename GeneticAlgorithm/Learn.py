@@ -2,6 +2,7 @@ import neat
 import time
 import os
 import sys
+from fcntl import fcntl, F_GETFL, F_SETFL
 
 training_bots = ["tictactoe-starterbot-python3"]
 
@@ -51,7 +52,6 @@ def play_game(net, bot_path, is_first):
         #TODO: REMOVE temporary auto-select 1st legal move
         import ast
         move = ast.literal_eval(state[2])[0]
-        raise Exception(str(move))
 
         # send the move
         connection.send_move(str(move))
@@ -133,12 +133,12 @@ class EngineConnector:
             engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ ibot_launch_str +"\" \"" + otherbot_launch_str + "\""
         else:
             engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ otherbot_launch_str +"\" \"" + ibot_launch_str + "\""
-
-        print("launchstr: " + engine_launch_str)
         self.engine_process = subprocess.Popen(engine_launch_str, shell=True, stdout=subprocess.PIPE, cwd=".."+ os.sep +"ultimatetictactoe-engine")
+        #avoid blocking by setting flags
+        flags = fcntl(self.engine_process.stdout, F_GETFL)
+        fcntl(self.engine_process.stdout, F_SETFL, flags | os.O_NONBLOCK)
 
     def read_state(self):
-        raise Exception ("entered read_State")
         received = ""
         received_selection = False
         while (not received_selection):
@@ -162,8 +162,8 @@ class EngineConnector:
 
         #process received into a tuple of board, macroboard, moves
         lines = received.splitlines(keepends=False)
-        print("state: " + str((lines[2], lines[4], lines[6])))
-        return (lines[2], lines[4], lines[6])
+        print("state: " + str((lines[1], lines[3], lines[5])))
+        return (lines[1], lines[3], lines[5])
 
     def send_move(self, selection):
         self.lock.acquire()
