@@ -18,7 +18,7 @@ def eval_genome(genome, config):
         for _ in range(num_reps):
             result = play_game(net, bot, False)
             cumulative_fitness = cumulative_fitness + fitness(result, False)
-    genome.fitness  = cumulative_fitness / len(training_bots * cumulative_fitness)
+    genome.fitness  = cumulative_fitness / (num_reps * len(training_bots))
 
 def fitness(game_res, is_first):
     #cases based on win status
@@ -40,10 +40,9 @@ def fitness(game_res, is_first):
 #play game with net being the net we are testing and bot the AI we are testing against
 def play_game(net, bot_path, is_first):
     connection = EngineConnector(bot_path, is_first)
-    win_status = connection.win_status()
     num_turns = 0
     # while win condition hasn't been met, loop
-    while (win_status == -1):
+    while (connection.engine_process.poll() != None):
         # read state of game
         state = connection.read_state()
         # get move from net
@@ -56,7 +55,7 @@ def play_game(net, bot_path, is_first):
         # send the move
         connection.send_move(str(move))
         num_turns += 1
-        win_status = connection.win_status()
+    win_status = connection.win_status()
     connection.close()
     return win_status, num_turns
 
@@ -162,7 +161,20 @@ class EngineConnector:
         #process received into a tuple of board, macroboard, moves
         lines = received.splitlines(keepends=False)
         #print("state: " + str((lines[1], lines[3], lines[5])))
-        return (lines[1], lines[3], lines[5])
+        return (self.process_board(lines[1]), self.process_macroboard(lines[3]), lines[5])
+
+    def process_board(self, pre_board):
+        if self.is_first:
+            return pre_board.replace("1","M").replace("2","Y")
+        else:
+            return pre_board.replace("2","M").replace("1","Y")
+
+    #TODO: fix
+    def process_macroboard(self, pre_macroboard):
+        if self.is_first:
+            return pre_macroboard.replace("1","M").replace("2","Y")
+        else:
+            return pre_macroboard.replace("2","M").replace("1","Y")
 
     def send_move(self, selection):
         self.lock.acquire()
@@ -178,6 +190,7 @@ class EngineConnector:
     def win_status(self):
         l = self.engine_process.stdout.readline().decode(sys.getdefaultencoding())
         while l != '':
+            print(l)
             if "Draw" in l:
                 return 0
             if "winner: player1" in l:
