@@ -20,7 +20,7 @@ class Position:
     
     def is_legal(self, x, y):
         mbx, mby = x//3, y//3
-        return self.macroboard[3*mbx+mby] == -1 and self.board[9*x+y] == 0
+        return self.macroboard[3*mby+mbx] == -1 and self.board[9*y+x] == 0
 
     def legal_moves(self):
         return [ (x, y) for x in range(9) for y in range(9) if self.is_legal(x, y) ]
@@ -28,7 +28,7 @@ class Position:
     def make_move(self, move, pid):
         x, y = move
         self.mLastX, self.mLastY = move
-        self.board[9*x+y] = pid
+        self.board[9*y+x] = pid
         self.updateMacroboard()
         
     def get_board(self):
@@ -41,11 +41,11 @@ class Position:
     def microboardFull(self, x, y):
         if x < 0 or y < 0:
             return True
-        if (self.macroboard[x*3+y] == 1 or self.macroboard[x*3+y] == 2):
+        if (self.macroboard[y*3+x] == 1 or self.macroboard[y*3+x] == 2):
             return True
         for my in range(y*3, y*3+3):
             for mx in range(x*3, x*3+3):
-                if (self.board[mx*9+my] == 0):
+                if (self.board[my*9+mx] == 0):
                     return False
         return True
 
@@ -53,36 +53,36 @@ class Position:
         for x in range(0, 3):
             for y in range(0, 3):
                 winner = self.getMicroboardWinner(x, y)
-                self.macroboard[x*3+y] = winner
+                self.macroboard[y*3+x] = winner
         if (not self.microboardFull(self.mLastX%3, self.mLastY%3)):
             self.macroboard[self.mLastX%3*3+self.mLastY%3] = -1
         else:
             for x in range(0, 3):
                 for y in range(0, 3):
                     if (not self.microboardFull(x, y)):
-                        self.macroboard[x*3+y] = -1
+                        self.macroboard[y*3+x] = -1
 
     def getMicroboardWinner(self, macroX, macroY):
-        startX = macroX*3
-        startY = macroY*3
-        for y in range(startY, startY+3):
-            if (self.board  [startX*9+y] == self.board  [(startX+1)*9+y] and self.board  [(startX+1)*9+y] == self.board  [(startX+2)*9+y] and self.board  [(startX)*9+y] > 0):
-                return self.board  [startX*9+y]
-        for x in range(startX, startX+3):
-            if (self.board  [x*9+startY] == self.board  [x*9+startY+1] and self.board  [x*9+startY+1] == self.board  [x*9+startY+2] and self.board  [x*9+startY] > 0):
-                return self.board  [x*9+startY]
-        if (self.board  [startX*9+startY] == self.board  [(startX+1)*9+startY+1] and self.board  [(startX+1)*9+startY+1] == self.board  [(startX+2)*9+startY+2] and self.board  [startX*9+startY] > 0):
-            return self.board  [startX*9+startY]
-        if (self.board  [(startX+2)*9+startY] == self.board  [(startX+1)*9+startY+1] and self.board  [(startX+1)*9+startY+1] == self.board  [startX*9+startY+2] and self.board  [(startX+2)*9+startY] > 0):
-            return self.board  [(startX+2)*9+startY]
+        startY = macroX*3
+        startX = macroY*3
+        for y in range(startX, startX+3):
+            if (self.board  [startY*9+x] == self.board  [(startY+1)*9+x] and self.board  [(startY+1)*9+x] == self.board  [(startY+2)*9+x] and self.board  [(startY)*9+x] > 0):
+                return self.board  [startY*9+x]
+        for x in range(startY, startY+3):
+            if (self.board  [y*9+startX] == self.board  [y*9+startX+1] and self.board  [y*9+startX+1] == self.board  [y*9+startX+2] and self.board  [y*9+startX] > 0):
+                return self.board  [y*9+startX]
+        if (self.board  [startY*9+startX] == self.board  [(startY+1)*9+startX+1] and self.board  [(startY+1)*9+startX+1] == self.board  [(startY+2)*9+startX+2] and self.board  [startY*9+startX] > 0):
+            return self.board  [startY*9+startX]
+        if (self.board  [(startY+2)*9+startX] == self.board  [(startY+1)*9+startX+1] and self.board  [(startY+1)*9+startX+1] == self.board  [startY*9+startX+2] and self.board  [(startY+2)*9+startX] > 0):
+            return self.board  [(startY+2)*9+startX]
         return 0
 
     def checkMacroboardWinner(self):
-        for y in range(0, 3):
-            if (self.macroboard[y] == self.macroboard[1*3+y] and self.macroboard[1*3+y] == self.macroboard[2*3+y] and self.macroboard[0*3+y] > 0):
-                return self.macroboard[0*3+y]
         for x in range(0, 3):
-            if (self.macroboard[x*3+0] == self.macroboard[x*3+1] and self.macroboard[x*3+1] == self.macroboard[x*3+2] and self.macroboard[x*3+0] > 0):
+            if (self.macroboard[x] == self.macroboard[1*3+x] and self.macroboard[1*3+x] == self.macroboard[2*3+x] and self.macroboard[0*3+x] > 0):
+                return self.macroboard[0*3+x]
+        for y in range(0, 3):
+            if (self.macroboard[y*3+0] == self.macroboard[y*3+1] and self.macroboard[y*3+1] == self.macroboard[y*3+2] and self.macroboard[y*3+0] > 0):
                 return self.macroboard[x*3+0]
         if (self.macroboard[0*3+0] == self.macroboard[1*3+1] and self.macroboard[1*3+1] == self.macroboard[2*3+2] and self.macroboard[0*3+0] > 0):
             return self.macroboard[0*3+0]

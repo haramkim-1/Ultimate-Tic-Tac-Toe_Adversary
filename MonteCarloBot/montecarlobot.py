@@ -1,7 +1,10 @@
 import random
+from random import randint
 import copy
 from enum import Enum
 import bisect
+import tkinter
+from tkinter import messagebox
 
 class Node:
     moves = {}
@@ -72,12 +75,10 @@ class MonteCarloBot:
         root.wins[self.oppid] = 1
         for i in range(0,iterations):
             self.monte_carlo_iter(copy.deepcopy(pos), root, self.myid)
-        max = 0
-        for (move, node) in (root.moves).items():
-            if node.wins/node.trials > max:
-                max = node.wins/node.trials
-                argmax = move
-        return argmax
+        return max(root.moves.items(), key=lambda m, n: n.wins/n.trials)[0]
 
     def get_move(self, pos, tleft):
-        return self.monte_carlo(pos, 1000)
+        #x = self.monte_carlo(pos, 1000)
+        lmoves = pos.legal_moves()
+        rm = randint(0, len(lmoves)-1)
+        return lmoves[rm]
