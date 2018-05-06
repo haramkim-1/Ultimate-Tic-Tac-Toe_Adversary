@@ -11,27 +11,34 @@ def eval_genome(genome, config):
         cumulative_fitness = cumulative_fitness + fitness(result)
     genome.fitness  = cumulative_fitness / len(training_bots)
 
+def fitness(game_res):
+    raise NotImplementedError
+
 #play game with net being the net we are testing and bot the AI we are testing against
 def play_game(net, bot_path):
     connection = EngineConnector(bot_path, False)
     win_status = connection.win_status()
+    num_turns = 0
     # while win condition hasn't been met, loop
     while (win_status == -1):
         # read state of game
         state = connection.read_state()
         # get move from net
-        move = get_move_from_net(net, state)
+        move = get_move_from_net(net, state[0])
         # send the move
         connection.send_move(str(move))
+        num_turns += 1
         win_status = connection.win_status()
-    return win_status
+    return win_status, num_turns
 
 # TODO: will extract new move
 def check_move_legal(moves_str, move):
     return str(move) in moves_str
 
 # TODO: should return a move in the form (x,y)
-def get_move_from_net(net, board_state, macroboard_state):
+def get_move_from_net(net, state):
+    board_state = state[0]
+    macroboard_state = state[1]
     board_moves = board_state.split(",")
     nn_input = []*198
     for i in range(0,81):
@@ -70,7 +77,7 @@ def get_move_from_net(net, board_state, macroboard_state):
     moves = range(0,81)
     moves = sorted(moves, key=lambda x:nn_output[x], reverse=True)
     for i in range(0,81):
-        if check_move_legal(board_state, macroboard_state, (moves[i]%9, moves[i]//9)):
+        if check_move_legal(state[3], (moves[i]%9, moves[i]//9)):
             return (moves[i]%9, moves[i]//9)
     assert False
 
@@ -103,7 +110,7 @@ class EngineConnector:
         self.engine_process = subprocess.Popen(engine_launch_str, shell=True, stdout=subprocess.PIPE, cwd=".."+ os.sep +"ultimatetictactoe-engine")
 
     def read_state(self):
-        recieved = ""
+        received = ""
         received_selection = False
         while (not received_selection):
             #try to read selection
@@ -115,8 +122,8 @@ class EngineConnector:
                 expected = "state"
                 if (expected in first_line):
                     received_selection = True
-                    recieved = pipe.read()
-                    print(recieved) #TODO: Remove this line
+                    received = pipe.read()
+                    print(received) #TODO: Remove this line
                     pipe.close()
                 pipe.close()
             finally:
@@ -124,8 +131,8 @@ class EngineConnector:
             #sleep for a duration to give time for selection to be made
             time.sleep(0.001)
 
-        #process recieved into a tuple of board, macroboard, moves
-        lines = recieved.splitlines(keepends=False)
+        #process received into a tuple of board, macroboard, moves
+        lines = received.splitlines(keepends=False)
         print("state: " + str((lines[2], lines[4], lines[6])))
         return (lines[2], lines[4], lines[6])
 
