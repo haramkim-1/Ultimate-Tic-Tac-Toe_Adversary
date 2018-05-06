@@ -13,7 +13,7 @@ def eval_genome(genome, config):
 
 #play game with net being the net we are testing and bot the AI we are testing against
 def play_game(net, bot_path):
-    connection = EngineConnector(bot_path)
+    connection = EngineConnector(bot_path, False)
     raise NotImplementedError
 
 # TODO: will extract new move
@@ -26,7 +26,7 @@ def get_move_from_net(net, state):
     raise NotImplementedError
 
 class EngineConnector:
-    def __init__(self, otherbot_path):
+    def __init__(self, otherbot_path, is_first):
         import uuid
         import subprocess
         import os
@@ -35,6 +35,7 @@ class EngineConnector:
         self.interface_pipe_path = self.str_uuid + "_pipe"
         self.interface_lock_path = self.str_uuid + "_pipe.lock"
         self.lock = FileLock(self.interface_lock_path)
+        self.is_first = is_first
         
         #create pipe file if it does not exist
         pipe = open(self.interface_pipe_path, "w+")
@@ -42,9 +43,13 @@ class EngineConnector:
 
         #run engine
         otherbot_launch_str = "python3 .."+ os.sep + otherbot_path + os.sep +"main.py"
-
         ibot_launch_str = "python3 .."+ os.sep +"EngineInterface"+ os.sep +"main.py " + os.path.abspath(self.interface_pipe_path)
-        engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ otherbot_launch_str +"\" \"" + ibot_launch_str + "\" 2>.."+ os.sep +"err.txt 1>.."+ os.sep +"out.txt"
+
+        if is_first:
+            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ ibot_launch_str +"\" \"" + otherbot_launch_str + "\" 2>.."+ os.sep +"err.txt 1>.."+ os.sep +"out.txt"
+        else:
+            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ otherbot_launch_str +"\" \"" + ibot_launch_str + "\" 2>.."+ os.sep +"err.txt 1>.."+ os.sep +"out.txt"
+            
         print("launchstr: " + engine_launch_str)
         self.engine_process = subprocess.Popen(engine_launch_str, shell=True, cwd=".."+ os.sep +"ultimatetictactoe-engine")
 
@@ -69,7 +74,10 @@ class EngineConnector:
                 self.lock.release()
             #sleep for a duration to give time for selection to be made
             time.sleep(0.001)
-        return recieved
+
+        #process recieved into a tuple of board, macroboard, moves
+        lines = recieved.splitlines(keepends=False)
+        return (lines[2], lines[4], lines[6])
 
     def send_move(self, selection):
         self.lock.acquire()
