@@ -11,32 +11,68 @@ def eval_genome(genome, config):
         cumulative_fitness = cumulative_fitness + fitness(result)
     genome.fitness  = cumulative_fitness / len(training_bots)
 
-# return true if a win condition has been met in the game, and false otherwise
-def win_condition_met(connection):
-    raise NotImplementedError
-    # while True:
-    #     l = connection.stdout.readline()
-    #     if "Draw!" in l or :
-    #         return True
-
 #play game with net being the net we are testing and bot the AI we are testing against
 def play_game(net, bot_path):
     connection = EngineConnector(bot_path, False)
-
+    win_status = connection.win_status()
     # while win condition hasn't been met, loop
-    # read state of game
-    # get move from net
-    # send the move
-    raise NotImplementedError
+    while (win_status == -1):
+        # read state of game
+        state = connection.read_state()
+        # get move from net
+        move = get_move_from_net(net, state)
+        # send the move
+        connection.send_move(str(move))
+        win_status = connection.win_status()
+    return win_status
 
 # TODO: will extract new move
 def check_move_legal(moves_str, move):
-
-    raise NotImplementedError
+    return move in moves_str
 
 # TODO: should return a move in the form (x,y)
-def get_move_from_net(net, state):
-    raise NotImplementedError
+def get_move_from_net(net, board_state, macroboard_state):
+    board_moves = board_state.split(",")
+    nn_input = []*198
+    for i in range(0,81):
+        if board_moves[i] == "y":
+            nn_input[i] = 0
+            nn_input[i+81] = 1
+        elif board_moves[i] == "m":
+            nn_input[i] = 1
+            nn_input[i+81] = 0
+        else:
+            nn_input[i] = 0
+            nn_input[i+81] = 0
+    mboard_s = macroboard_state.split(",")
+    for i in range(0,9):
+        if mboard_s[i] == "y":
+            nn_input[162+i] = 0
+            nn_input[162+9+i] = 1
+            nn_input[162+18+i] = 0
+            nn_input[162+27+i] = 0
+        elif mboard_s[i] == "m":
+            nn_input[162+i] = 1
+            nn_input[162+9+i] = 0
+            nn_input[162+18+i] = 0
+            nn_input[162+27+i] = 0
+        elif mboard_s[i] == "d":
+            nn_input[162+i] = 0
+            nn_input[162+9+i] = 0
+            nn_input[162+18+i] = 1
+            nn_input[162+27+i] = 0
+        else:
+            nn_input[162+i] = 0
+            nn_input[162+9+i] = 0
+            nn_input[162+18+i] = 0
+            nn_input[162+27+i] = 1
+    nn_output = net.activate(nn_input)
+    moves = range(0,81)
+    moves = sorted(moves, key=lambda x:nn_output[x], reverse=True)
+    for i in range(0,81):
+        if check_move_legal(board_state, macroboard_state, (moves[i]%9, moves[i]//9)):
+            return (moves[i]%9, moves[i]//9)
+    assert False
 
 class EngineConnector:
     def __init__(self, otherbot_path, is_first):
@@ -102,3 +138,16 @@ class EngineConnector:
             pipe.close()
         finally:
             self.lock.release()
+
+    # return 0 if draw, 1 if player 1 wins, 2 if player 2 wins, -1 if active game
+    def win_status(self):
+        l = self.engine_process.stdout.readline()
+        while l != '':
+            if "Draw" in l:
+                return 0
+            if "winner: player1" in l:
+                return 1
+            if "winner: player2" in l:
+                return 2
+            l = self.engine_process.stdout.readline()
+        return -1
