@@ -110,7 +110,7 @@ class EngineConnector:
         self.engine_process = subprocess.Popen(engine_launch_str, shell=True, stdout=subprocess.PIPE, cwd=".."+ os.sep +"ultimatetictactoe-engine")
 
     def read_state(self):
-        recieved = ""
+        received = ""
         received_selection = False
         while (not received_selection):
             #try to read selection
@@ -122,8 +122,8 @@ class EngineConnector:
                 expected = "state"
                 if (expected in first_line):
                     received_selection = True
-                    recieved = pipe.read()
-                    print(recieved) #TODO: Remove this line
+                    received = pipe.read()
+                    print(received) #TODO: Remove this line
                     pipe.close()
                 pipe.close()
             finally:
@@ -131,8 +131,8 @@ class EngineConnector:
             #sleep for a duration to give time for selection to be made
             time.sleep(0.001)
 
-        #process recieved into a tuple of board, macroboard, moves
-        lines = recieved.splitlines(keepends=False)
+        #process received into a tuple of board, macroboard, moves
+        lines = received.splitlines(keepends=False)
         print("state: " + str((lines[2], lines[4], lines[6])))
         return (lines[2], lines[4], lines[6])
 

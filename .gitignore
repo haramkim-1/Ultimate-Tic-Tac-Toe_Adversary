@@ -115,3 +115,5 @@ rb_err.txt
 rb_out.txt
 mc_log.txt
 run_engine.sh
+mc_out.txt
+mc_err.txt
