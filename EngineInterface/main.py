@@ -29,13 +29,14 @@ if __name__ == '__main__':
     from filelock import FileLock
     from position import Position
     from interfacebot import InterfaceBot
+    import os
 
     prefix = sys.argv[1]
     interface_pipe_path = prefix
     interface_lock_path = prefix + '.lock'
     lock = FileLock(interface_lock_path)
 
-    log = open("/home/haram/Projects/aiprac_project/Ultimate-Tic-Tac-Toe_Adversary/log.txt", "w+")
+    log = open(".." + os.sep + "ibot_log.txt", "w+")
 
     pos = Position()
     bot = InterfaceBot(interface_pipe_path, interface_lock_path, lock, log)
