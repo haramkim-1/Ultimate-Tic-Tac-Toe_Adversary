@@ -1,3 +1,5 @@
+import traceback
+
 def parse_command(instr, bot, pos):
     if instr.startswith('action move'):
         time = int(instr.split(' ')[-1])
@@ -33,15 +35,22 @@ if __name__ == '__main__':
     interface_lock_path = prefix + '.lock'
     lock = FileLock(interface_lock_path)
 
+    log = open("/home/haram/Projects/aiprac_project/Ultimate-Tic-Tac-Toe_Adversary/log.txt", "w+")
+
     pos = Position()
-    bot = InterfaceBot(interface_pipe_path, interface_lock_path, lock)
-    
-    while True:
-        try:
-            instr = input()
-        except Exception as e:
-            sys.stderr.write('error reading input')
-        outstr = parse_command(instr, bot, pos)
-        sys.stdout.write(outstr)
-        sys.stdout.flush()            
+    bot = InterfaceBot(interface_pipe_path, interface_lock_path, lock, log)
+
+    try:
+        while True:
+            try:
+                instr = input()
+            except Exception as e:
+                sys.stderr.write('error reading input')
+            outstr = parse_command(instr, bot, pos)
+            sys.stdout.write(outstr)
+            sys.stdout.flush()
+    except Exception as e:
+        log.write(str(e) + "\n")
+        log.write(str(traceback.format_exc()))
+        log.flush()
             

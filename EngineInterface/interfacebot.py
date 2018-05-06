@@ -1,11 +1,13 @@
 
 class InterfaceBot:
 
-    def __init__(self, p_file, p_file_lock, lock):
+    def __init__(self, p_file, p_file_lock, lock, log):
         self.pipe_path = p_file
-        self.pipe_lock_path = p_file_lock
-        self.moves = 0
         self.lock = lock
+        
+        self.log = log
+        self.log.write(p_file + "\n")
+        self.log.flush()
 
     def get_move(self, pos, tleft):
         import time
@@ -15,9 +17,12 @@ class InterfaceBot:
         self.lock.acquire()
         try:
             pipe = open(self.pipe_path, "w+")
-            to_write = "state\nmacroboard\n" + pos.get_macroboard + "\n" + str(lmoves)
+            to_write = "state\nboard\n" + str(pos.get_board()) + "\nmacroboard\n" + str(pos.get_macroboard()) + "\nmoves\n" + str(lmoves)
             pipe.write(to_write)
             pipe.close()
+
+            self.log.write(to_write + "\n")
+            self.log.flush()
         finally:
             self.lock.release()
 
@@ -36,10 +41,10 @@ class InterfaceBot:
 
                     #TODO: read from file
                     input("wait for input")
-                    pipe.close();
-                    return lmoves[0];
+                    pipe.close()
+                    return lmoves[0]
 
-                pipe.close();
+                pipe.close()
             finally:
                 self.lock.release()
 
