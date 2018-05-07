@@ -35,16 +35,20 @@ if __name__ == '__main__':
     interface_lock_path = prefix + '.lock'
     lock = FileLock(interface_lock_path)
 
-    log_path = ".."+ os.sep +"ibot_log.txt"
-    if os.path.exists(log_path):
-        os.remove(log_path)
+    #log_path = ".."+ os.sep +"ibot_log.txt"
+    #if os.path.exists(log_path):
+    #    os.remove(log_path)
+    #log = open(log_path, "w+")
+    #log.write("log opened")
+    #log.flush()
 
-    #log = open(".." + os.sep + prefix + "_ibot_log.txt", "w+")
-    log = open(log_path, "w+")
-    #log = open("../" + str(uuid.uuid1()) + "_ibot_log.txt", "w+")
-    
+    exn_log_path = ".."+ os.sep +"exn_log.log"
+    exn_log_lock_path = ".."+ os.sep +"exn_log.log.lock"
+    exn_log_lock = FileLock(exn_log_lock_path)
+
     pos = Position()
-    bot = InterfaceBot(interface_pipe_path, lock, log)
+    #bot = InterfaceBot(interface_pipe_path, lock, log)
+    bot = InterfaceBot(interface_pipe_path, lock)
 
     try:
         while True:
@@ -56,8 +60,16 @@ if __name__ == '__main__':
             sys.stdout.write(outstr)
             sys.stdout.flush()
     except Exception as e:
-        log.write(str(e) + "\n")
-        log.write(str(traceback.format_exc()))
-        log.flush()
-        log.close()
+        try:
+            exn_log_lock.acquire()
+            exn_log = open(exn_log_path, "a+")
+            exn_log.write(str(e) + "\n")
+            exn_log.write(str(traceback.format_exc()))
+            exn_log.close()
+        finally:
+            exn_log_lock.release()
+        #log.write(str(e) + "\n")
+        #log.write(str(traceback.format_exc()))
+        #log.flush()
+        #log.close()
             

@@ -12,7 +12,7 @@ def eval_genomes(genomes, config):
 
 def eval_genome(genome, config):
     net = neat.nn.FeedForwardNetwork.create(genome, config)
-    num_reps = 1
+    num_reps = 100
     cumulative_fitness = 0
     for bot in training_bots:
         for _ in range(num_reps):
@@ -259,9 +259,9 @@ def run(config_file):
     p.add_reporter(checkpointer)
 
     # Run for up to 300 generations.
-    #pe = neat.ParallelEvaluator(4, eval_genome)
-    #winner = p.run(pe.evaluate, 10000)
-    winner = p.run(eval_genomes, 1)
+    pe = neat.ParallelEvaluator(20, eval_genome)
+    winner = p.run(pe.evaluate, 200)
+    #winner = p.run(eval_genomes, 1)
 
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
@@ -274,6 +274,7 @@ if __name__ == '__main__':
     # Determine path to configuration file. This path manipulation is
     # here so that the script will run successfully regardless of the
     # current working directory.
+    print("running with niceness: " + str(os.nice(8)))
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, 'config-feedforward')
     if not os.path.exists("pipes" + os.sep):
