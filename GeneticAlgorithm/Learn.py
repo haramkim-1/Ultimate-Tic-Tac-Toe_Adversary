@@ -12,7 +12,7 @@ def eval_genomes(genomes, config):
 
 def eval_genome(genome, config):
     net = neat.nn.FeedForwardNetwork.create(genome, config)
-    num_reps = 20
+    num_reps = 1
     cumulative_fitness = 0
     for bot in training_bots:
         for _ in range(num_reps):
@@ -263,7 +263,7 @@ def run(config_file):
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
-    checkpointer = neat.Checkpointer(generation_interval=1000)
+    checkpointer = neat.Checkpointer(generation_interval=10)
     p.add_reporter(checkpointer)
 
     # Run for up to 300 generations.
