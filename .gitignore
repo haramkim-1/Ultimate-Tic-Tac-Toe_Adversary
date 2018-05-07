@@ -120,3 +120,8 @@ mc_err.txt
 *.pipe
 *.lock
 ibot_log.txt
+.idea/workspace.xml
+.idea/vcs.xml
+.idea/modules.xml
+.idea/misc.xml
+.idea/Ultimate-Tic-Tac-Toe_Adversary.iml
