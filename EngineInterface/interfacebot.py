@@ -17,6 +17,7 @@ class InterfaceBot:
         lmoves = pos.legal_moves()
         #if pipe missing, abort
         if not self.check_pipe_exists():
+            #self.log.write("file missing; exiting")
             sys.exit(0)
         
         #write phase
@@ -57,12 +58,13 @@ class InterfaceBot:
                 self.lock.release()
 
             #sleep for a duration to give time for selection to be made
-            time.sleep(0.005)
+            time.sleep(0.001)
 
         self.log.write("\nmove:\n" + received + "\n")
+        self.log.flush()
         #return the selected move from lmoves
         lmoves_strings = [str(x) for x in lmoves]
         return lmoves[lmoves_strings.index(received)]
 
     def check_pipe_exists(self):
-        os.path.exists(self.pipe_path)
+        return os.path.exists(self.pipe_path)

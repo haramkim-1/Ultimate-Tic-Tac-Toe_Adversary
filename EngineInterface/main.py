@@ -42,7 +42,7 @@ if __name__ == '__main__':
     #log = open(".." + os.sep + prefix + "_ibot_log.txt", "w+")
     log = open(log_path, "w+")
     #log = open("../" + str(uuid.uuid1()) + "_ibot_log.txt", "w+")
-
+    
     pos = Position()
     bot = InterfaceBot(interface_pipe_path, lock, log)
 
