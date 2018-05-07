@@ -17,7 +17,8 @@ class InterfaceBot:
         lmoves = pos.legal_moves()
         #if pipe missing, abort
         if not self.check_pipe_exists():
-            #self.log.write("file missing; exiting")
+            self.log.write("\nexiting due to missing file\n")
+            self.log.flush()
             sys.exit(0)
         
         #write phase
@@ -41,6 +42,8 @@ class InterfaceBot:
         while (not received_selection):
             #if pipe missing, abort
             if not self.check_pipe_exists():
+                self.log.write("\nexiting due to missing file\n")
+                self.log.flush()
                 sys.exit(0)
             #try to read selection
             self.lock.acquire()

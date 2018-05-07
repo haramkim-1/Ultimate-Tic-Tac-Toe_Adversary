@@ -41,22 +41,38 @@ def fitness(game_res, is_first):
 def play_game(net, bot_path, is_first):
     connection = EngineConnector(bot_path, is_first)
     num_turns = 0
-    # while win condition hasn't been met, loop
-    while (connection.engine_process.poll() != None):
-        # read state of game
-        state = connection.read_state()
-        # get move from net
-        #move = get_move_from_net(net, state[0])
-        
-        #TODO: REMOVE temporary auto-select 1st legal move
-        import ast
-        move = ast.literal_eval(state[2])[0]
-
-        # send the move
-        connection.send_move(str(move))
-        num_turns += 1
+    win_status = -1
     win_status = connection.win_status()
-    connection.close()
+    try:
+       # win_status = connection.win_status()
+        # while win condition hasn't been met, loop
+        while (win_status == -1):
+            #print("turn: " + str(num_turns))
+            # read state of game
+            state = None
+            while(state == None and connection.engine_process.poll() == None):
+                state = connection.try_read_state()
+            #print("state read")
+            #if failed to read state, update win_status and break
+            if state == None:
+                #print("exiting")
+                win_status = connection.win_status()
+                break
+            # get move from net
+            #move = get_move_from_net(net, state[0])
+            
+            #TODO: REMOVE temporary auto-select 1st legal move
+            import ast
+            move = ast.literal_eval(state[2])[0]
+
+            # send the move
+            connection.send_move(str(move))
+            num_turns += 1
+            #print("move sent")
+
+            win_status = connection.win_status()
+    finally:
+        connection.close()
     return win_status, num_turns
 
 # will extract new move
@@ -115,36 +131,39 @@ class EngineConnector:
         import subprocess
         from filelock import FileLock
         self.str_uuid = str(uuid.uuid1())
-        self.interface_pipe_path = "pipes/" + self.str_uuid + ".pipe"
+        self.interface_pipe_path = os.path.abspath("pipes"+ os.sep + self.str_uuid + ".pipe")
         self.interface_lock_path = self.interface_pipe_path + ".lock"
         self.lock = FileLock(self.interface_lock_path)
         self.is_first = is_first
 
-        #create pipe file if it does not exist
+        #create pipe file
+        #os.mknod(os.path.abspath(self.interface_pipe_path))
         pipe = open(self.interface_pipe_path, "w+")
         pipe.close()
 
         #run engine
         otherbot_launch_str = "python3 .."+ os.sep + otherbot_path + os.sep +"main.py"
-        ibot_launch_str = "python3 .."+ os.sep +"EngineInterface"+ os.sep +"main.py " + os.path.abspath(self.interface_pipe_path)
+        ibot_launch_str = "python3 .."+ os.sep +"EngineInterface"+ os.sep +"main.py " + self.interface_pipe_path
 
         if is_first:
             engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ ibot_launch_str +"\" \"" + otherbot_launch_str + "\""
         else:
             engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ otherbot_launch_str +"\" \"" + ibot_launch_str + "\""
-        self.engine_process = subprocess.Popen(engine_launch_str, shell=True, stdout=subprocess.PIPE, cwd=".."+ os.sep +"ultimatetictactoe-engine")
+        self.engine_process = subprocess.Popen(engine_launch_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=".."+ os.sep +"ultimatetictactoe-engine")
         #avoid blocking by setting flags
         flags = fcntl(self.engine_process.stdout, F_GETFL)
         fcntl(self.engine_process.stdout, F_SETFL, flags | os.O_NONBLOCK)
+        fcntl(self.engine_process.stderr, F_SETFL, flags | os.O_NONBLOCK)
 
     def read_state(self):
+        #print("reading state")
         received = ""
         received_selection = False
         while (not received_selection):
             #try to read selection
             self.lock.acquire()
             try:
-                pipe = open(self.interface_pipe_path, "r+")
+                pipe = open(self.interface_pipe_path, "r")
                 #check that file has been updated
                 first_line = pipe.readline()
                 expected = "state"
@@ -157,11 +176,45 @@ class EngineConnector:
                 self.lock.release()
             #sleep for a duration to give time for selection to be made
             time.sleep(0.001)
-
         #process received into a tuple of board, macroboard, moves
         lines = received.splitlines(keepends=False)
         #print("state: " + str((lines[1], lines[3], lines[5])))
         return (self.process_board(lines[1]), self.process_macroboard(lines[3]), lines[5])
+
+    #attempts a single state read
+    def try_read_state(self):
+        received = ""
+        received_selection = False
+        self.lock.acquire()
+        try:
+            pipe = open(self.interface_pipe_path, "r")
+            #check that file has been updated
+            first_line = pipe.readline()
+            expected = "state"
+            if (expected in first_line):
+                received_selection = True
+                received = pipe.read()
+                pipe.close()
+            pipe.close()
+        finally:
+            self.lock.release()
+        if received_selection:
+            lines = received.splitlines(keepends=False)
+            #print("state: " + str((lines[1], lines[3], lines[5]))) 
+            return (self.process_board(lines[1]), self.process_macroboard(lines[3]), lines[5])
+        else:
+            return None
+        
+    
+    def send_move(self, selection):
+        self.lock.acquire()
+        try:
+            pipe = open(self.interface_pipe_path, "w+")
+            pipe.write("move\n")
+            pipe.write(selection)
+            pipe.close()
+        finally:
+            self.lock.release()
 
     def process_board(self, pre_board):
         if self.is_first:
@@ -176,21 +229,12 @@ class EngineConnector:
         else:
             return pre_macroboard.replace("2","M").replace("1","Y")
 
-    def send_move(self, selection):
-        self.lock.acquire()
-        try:
-            pipe = open(self.interface_pipe_path, "w+")
-            pipe.write("move\n")
-            pipe.write(selection)
-            pipe.close()
-        finally:
-            self.lock.release()
-
     # return 0 if draw, 1 if player 1 wins, 2 if player 2 wins, -1 if active game
     def win_status(self):
+        #print("win_status called")
         l = self.engine_process.stdout.readline().decode(sys.getdefaultencoding())
-        while l != '':
-            print(l)
+        while l != "":
+            #print("l:" + l)
             if "Draw" in l:
                 return 0
             if "winner: player1" in l:
@@ -201,9 +245,9 @@ class EngineConnector:
         return -1
 
     def close(self):
-        os.remove(self.interface_pipe_path)
         if os.path.exists(self.interface_lock_path):
             os.remove(self.interface_lock_path)
+        os.remove(self.interface_pipe_path)
 
 def run(config_file):
     # Load configuration.
@@ -223,9 +267,9 @@ def run(config_file):
     p.add_reporter(checkpointer)
 
     # Run for up to 300 generations.
-    pe = neat.ParallelEvaluator(4, eval_genome)
+    #pe = neat.ParallelEvaluator(4, eval_genome)
     #winner = p.run(pe.evaluate, 10000)
-    winner = p.run(eval_genomes, 10000)
+    winner = p.run(eval_genomes, 1)
 
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
