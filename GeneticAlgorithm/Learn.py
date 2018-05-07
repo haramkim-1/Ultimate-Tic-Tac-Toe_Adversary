@@ -59,11 +59,11 @@ def play_game(net, bot_path, is_first):
                 win_status = connection.win_status()
                 break
             # get move from net
-            #move = get_move_from_net(net, state[0])
+            move = get_move_from_net(net, state)
             
             #TODO: REMOVE temporary auto-select 1st legal move
-            import ast
-            move = ast.literal_eval(state[2])[0]
+            #import ast
+            #move = ast.literal_eval(state[2])[0]
 
             # send the move
             connection.send_move(str(move))
@@ -84,7 +84,7 @@ def get_move_from_net(net, state):
     board_state = state[0]
     macroboard_state = state[1]
     board_moves = board_state.split(",")
-    nn_input = []*189
+    nn_input = [0]*189
     for i in range(0,81):
         if board_moves[i] == "y":
             nn_input[i] = 0
@@ -113,7 +113,7 @@ def get_move_from_net(net, state):
     moves = range(0,81)
     moves = sorted(moves, key=lambda x:nn_output[x], reverse=True)
     for i in range(0,81):
-        if check_move_legal(state[3], (moves[i]%9, moves[i]//9)):
+        if check_move_legal(state[2], (moves[i]%9, moves[i]//9)):
             return (moves[i]%9, moves[i]//9)
     assert False
 
@@ -210,16 +210,16 @@ class EngineConnector:
 
     def process_board(self, pre_board):
         if self.is_first:
-            return pre_board.replace("1","M").replace("2","Y")
+            return pre_board.replace("1","m").replace("2","y")
         else:
-            return pre_board.replace("2","M").replace("1","Y")
+            return pre_board.replace("2","m").replace("1","y")
 
     #TODO: fix
     def process_macroboard(self, pre_macroboard):
         if self.is_first:
-            return pre_macroboard.replace("1","M").replace("2","Y")
+            return pre_macroboard.replace("1","m").replace("2","y")
         else:
-            return pre_macroboard.replace("2","M").replace("1","Y")
+            return pre_macroboard.replace("2","m").replace("1","y")
 
     # return 0 if draw, 1 if player 1 wins, 2 if player 2 wins, -1 if active game
     def win_status(self):
