@@ -47,7 +47,7 @@ node_delete_prob        = 0.2
 
 # network parameters, 81 nodes for X, 81 nodes for O,
 # 9 nodes for macroboard * number of traits (active, player 1 won, player 2 won, board active)
-num_hidden              = 0
+num_hidden              = 5
 num_inputs              = 189
 num_outputs             = 81
 
