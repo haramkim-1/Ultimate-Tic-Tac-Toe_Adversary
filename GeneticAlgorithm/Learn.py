@@ -8,7 +8,7 @@ training_bots = ["tictactoe-starterbot-python3"]
 
 def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
-        eval_genome(genome, config)
+        genome.fitness = eval_genome(genome, config)
 
 def eval_genome(genome, config):
     net = neat.nn.FeedForwardNetwork.create(genome, config)
@@ -18,11 +18,13 @@ def eval_genome(genome, config):
         for _ in range(num_reps):
             result = play_game(net, bot, False)
             cumulative_fitness = cumulative_fitness + fitness(result, False)
-    genome.fitness  = cumulative_fitness / (num_reps * len(training_bots))
+    fitness_float = cumulative_fitness / (num_reps * len(training_bots))
+    assert isinstance(fitness_float, float)
+    return fitness_float
 
 def fitness(game_res, is_first):
     #cases based on win status
-    if game_res[0] == 0:
+    if game_res[0] == 0: #draw
         return 0
     elif game_res[0] == 1: #player 1 wins
         if is_first:
@@ -261,6 +263,8 @@ def run(config_file):
     # Run for up to 300 generations.
     pe = neat.ParallelEvaluator(20, eval_genome)
     winner = p.run(pe.evaluate, 200)
+    #pe = neat.ParallelEvaluator(2, eval_genome)
+    #winner = p.run(pe.evaluate, 1)
     #winner = p.run(eval_genomes, 1)
 
     # Display the winning genome.
@@ -274,7 +278,7 @@ if __name__ == '__main__':
     # Determine path to configuration file. This path manipulation is
     # here so that the script will run successfully regardless of the
     # current working directory.
-    print("running with niceness: " + str(os.nice(8)))
+    print("running with niceness: " + str(os.nice(10)))
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, 'config-feedforward')
     if not os.path.exists("pipes" + os.sep):
