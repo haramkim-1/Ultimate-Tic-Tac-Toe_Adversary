@@ -84,7 +84,7 @@ def get_move_from_net(net, state):
     board_state = state[0]
     macroboard_state = state[1]
     board_moves = board_state.split(",")
-    nn_input = []*198
+    nn_input = []*189
     for i in range(0,81):
         if board_moves[i] == "y":
             nn_input[i] = 0
@@ -101,22 +101,14 @@ def get_move_from_net(net, state):
             nn_input[162+i] = 0
             nn_input[162+9+i] = 1
             nn_input[162+18+i] = 0
-            nn_input[162+27+i] = 0
         elif mboard_s[i] == "m":
             nn_input[162+i] = 1
             nn_input[162+9+i] = 0
             nn_input[162+18+i] = 0
-            nn_input[162+27+i] = 0
-        elif mboard_s[i] == "d":
+        elif mboard_s[i] == "-1":
             nn_input[162+i] = 0
             nn_input[162+9+i] = 0
             nn_input[162+18+i] = 1
-            nn_input[162+27+i] = 0
-        else:
-            nn_input[162+i] = 0
-            nn_input[162+9+i] = 0
-            nn_input[162+18+i] = 0
-            nn_input[162+27+i] = 1
     nn_output = net.activate(nn_input)
     moves = range(0,81)
     moves = sorted(moves, key=lambda x:nn_output[x], reverse=True)
