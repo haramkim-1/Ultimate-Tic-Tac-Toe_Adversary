@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 cd GeneticAlgorithm
 
-DATE=$(date '+%d-%b-%Y-%H:%M')
+DATE=$(date '+%d-%b-%Y-%H-%M')
 DIR=old_checkpoints/"$DATE"
 mkdir "$DIR"
 
