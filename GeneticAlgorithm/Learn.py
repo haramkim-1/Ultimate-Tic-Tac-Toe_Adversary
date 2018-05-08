@@ -261,7 +261,7 @@ def run(config_file):
     p.add_reporter(checkpointer)
 
     # Run for up to 300 generations.
-    pe = neat.ParallelEvaluator(20, eval_genome)
+    pe = neat.ParallelEvaluator(30, eval_genome)
     winner = p.run(pe.evaluate, 150)
     #pe = neat.ParallelEvaluator(2, eval_genome)
     #winner = p.run(pe.evaluate, 1)
