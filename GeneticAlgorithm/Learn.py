@@ -12,7 +12,7 @@ def eval_genomes(genomes, config):
 
 def eval_genome(genome, config):
     net = neat.nn.FeedForwardNetwork.create(genome, config)
-    num_reps = 100
+    num_reps = 30
     cumulative_fitness = 0
     for bot in training_bots:
         for _ in range(num_reps):
@@ -262,7 +262,7 @@ def run(config_file):
 
     # Run for up to 300 generations.
     pe = neat.ParallelEvaluator(20, eval_genome)
-    winner = p.run(pe.evaluate, 200)
+    winner = p.run(pe.evaluate, 150)
     #pe = neat.ParallelEvaluator(2, eval_genome)
     #winner = p.run(pe.evaluate, 1)
     #winner = p.run(eval_genomes, 1)

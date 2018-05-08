@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 cd GeneticAlgorithm
 
-python Learn.py 2>ga_error_log.txt 1>ga_stdout_log.txt &
+DATE=$(date '+%d-%b-%Y')
+DIR=old_checkpoints/"$DATE"
+mkdir "$DIR"
+
+python Learn.py 2>"$DIR"/error_log.txt 1>"$DIR"/stdout_log.txt
+
+mv neat-checkpoint-*. "$DIR"
 
 cd ..
