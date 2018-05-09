@@ -24,11 +24,19 @@ def parse_command(instr, bot, pos):
 
 if __name__ == '__main__':
     import sys
+    import neat
     from position import Position
-    from randombot import RandomBot
+    from nnbot import NeuralNetworkBot
+
+    #extract path to checkpoint from CLI
+    checkpoint_path = sys.argv[1]
+    population = neat.Checkpointer.restore_checkpoint(checkpoint_path)
+    config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                         neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                         "../GeneticAlgorithm/config-feedforward")
 
     pos = Position()
-    bot = RandomBot()
+    bot = NeuralNetworkBot(population, config)
     
     while True:
         try:
