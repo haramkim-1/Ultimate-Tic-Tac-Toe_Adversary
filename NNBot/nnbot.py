@@ -2,9 +2,8 @@ import neat
 
 class NeuralNetworkBot:
 
-    def __init__(self, config, pop):
-        self.genome = pop.best_genome
-        self.neuralnet = neat.nn.FeedForwardNetwork.create(self.genome, config)
+    def __init__(self, net):
+        self.neuralnet = net
         self.order_detected = False #flag for if we've already found the order
         self.is_first = False #default value, not known at this point
     

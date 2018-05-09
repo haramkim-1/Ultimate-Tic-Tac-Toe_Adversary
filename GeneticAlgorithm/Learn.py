@@ -11,7 +11,8 @@ debug=True #turn off for real run
 if debug:
     training_bots = ["tictactoe-starterbot-python3"]
 else:
-    training_bots = ["tictactoe-starterbot-python3", "MonteCarloBot"]
+    #training_bots = ["tictactoe-starterbot-python3", "MonteCarloBot"]
+    training_bots = ["tictactoe-starterbot-python3"]
 
 def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
@@ -287,6 +288,7 @@ def run(config_file):
     print('\nBest genome:\n{!s}'.format(winner))
 
     # write the most fit nn
+    checkpointer.save_checkpoint(config, p, winner, checkpointer.current_generation)
     winner_net = neat.nn.FeedForwardNetwork.create(winner, config)
     pickle_winner_net(winner_net)
 

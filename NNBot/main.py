@@ -30,6 +30,7 @@ if __name__ == '__main__':
     from filelock import FileLock
     import os
     import traceback
+    import pickle
 
     #logging
     exn_log_path = ".."+ os.sep +"nnb_exn_log.log"
@@ -37,17 +38,14 @@ if __name__ == '__main__':
     exn_log_lock = FileLock(exn_log_lock_path)
 
     #extract path to checkpoint from CLI
-    checkpoint_path = sys.argv[1]
+    pickle_path = sys.argv[1]
 
     pos = Position()
     
     try:
-        #get population and configs
-        population = neat.Checkpointer.restore_checkpoint(checkpoint_path)
-        config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
-                         neat.DefaultSpeciesSet, neat.DefaultStagnation,
-                         "../GeneticAlgorithm/config-feedforward")
-        bot = NeuralNetworkBot(config, population)
+        #get neural network
+        net = pickle.load(open( pickle_path, "rb" ))
+        bot = NeuralNetworkBot(net)
 
         while True:
             try:
