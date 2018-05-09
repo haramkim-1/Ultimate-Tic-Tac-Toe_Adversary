@@ -42,8 +42,8 @@ if __name__ == '__main__':
     #log.write("log opened")
     #log.flush()
 
-    exn_log_path = ".."+ os.sep +"exn_log.log"
-    exn_log_lock_path = ".."+ os.sep +"exn_log.log.lock"
+    exn_log_path = ".."+ os.sep +"ib_exn_log.log"
+    exn_log_lock_path = ".."+ os.sep +"ib_exn_log.log.lock"
     exn_log_lock = FileLock(exn_log_lock_path)
 
     pos = Position()
