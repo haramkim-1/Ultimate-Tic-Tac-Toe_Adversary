@@ -4,7 +4,7 @@ import os
 import sys
 from fcntl import fcntl, F_GETFL, F_SETFL
 
-training_bots = ["tictactoe-starterbot-python3"]
+training_bots = ["tictactoe-starterbot-python3", "MonteCarloBot"]
 
 def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
@@ -216,7 +216,6 @@ class EngineConnector:
         else:
             return pre_board.replace("2","m").replace("1","y")
 
-    #TODO: fix
     def process_macroboard(self, pre_macroboard):
         if self.is_first:
             return pre_macroboard.replace("1","m").replace("2","y")
@@ -265,14 +264,14 @@ def run(config_file):
     winner = p.run(pe.evaluate, 150)
     #pe = neat.ParallelEvaluator(2, eval_genome)
     #winner = p.run(pe.evaluate, 1)
-    #winner = p.run(eval_genomes, 1)
 
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
 
     # write the most fit nn
     #winner_net = neat.nn.FeedForwardNetwork.create(winner, config)
-    #checkpointer.save_checkpoint(config, p, checkpointer.current_generation)
+    #save the current generation as a checkpoint
+    checkpointer.save_checkpoint(config, p, winner, checkpointer.current_generation)
 
 if __name__ == '__main__':
     # Determine path to configuration file. This path manipulation is
