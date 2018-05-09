@@ -27,22 +27,42 @@ if __name__ == '__main__':
     import neat
     from position import Position
     from nnbot import NeuralNetworkBot
+    from filelock import FileLock
+    import os
+    import traceback
+
+    #logging
+    exn_log_path = ".."+ os.sep +"nnb_exn_log.log"
+    exn_log_lock_path = ".."+ os.sep +"nnb_exn_log.log.lock"
+    exn_log_lock = FileLock(exn_log_lock_path)
 
     #extract path to checkpoint from CLI
     checkpoint_path = sys.argv[1]
-    population = neat.Checkpointer.restore_checkpoint(checkpoint_path)
-    config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
-                         neat.DefaultSpeciesSet, neat.DefaultStagnation,
-                         "../GeneticAlgorithm/config-feedforward")
 
     pos = Position()
-    bot = NeuralNetworkBot(population, config)
     
-    while True:
+    try:
+        #get population and configs
+        population = neat.Checkpointer.restore_checkpoint(checkpoint_path)
+        config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                         neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                         "../GeneticAlgorithm/config-feedforward")
+        bot = NeuralNetworkBot(config, population)
+
+        while True:
+            try:
+                instr = input()       
+            except Exception as e:
+                sys.stderr.write('error reading input')
+            outstr = parse_command(instr, bot, pos)
+            sys.stdout.write(outstr)
+            sys.stdout.flush() 
+    except Exception as e:
         try:
-            instr = input()       
-        except Exception as e:
-            sys.stderr.write('error reading input')
-        outstr = parse_command(instr, bot, pos)
-        sys.stdout.write(outstr)
-        sys.stdout.flush()   
+            exn_log_lock.acquire()
+            exn_log = open(exn_log_path, "a+")
+            exn_log.write(str(e) + "\n")
+            exn_log.write(str(traceback.format_exc()))
+            exn_log.close()
+        finally:
+            exn_log_lock.release()
