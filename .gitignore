@@ -131,3 +131,5 @@ GeneticAlgorithm/ga_error_log.txt
 download_results.sh
 *.pickle
 logs/
+ultimatetictactoe-engine/run_nnb_test.sh
+NNBot/run_nnb_test.sh
