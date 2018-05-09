@@ -19,7 +19,6 @@ def eval_genomes(genomes, config):
         genome.fitness = eval_genome(genome, config)
 
 def eval_genome(genome, config):
-    sys.stdout.flush()
     net = neat.nn.FeedForwardNetwork.create(genome, config)
     if debug:
         num_reps = 1
