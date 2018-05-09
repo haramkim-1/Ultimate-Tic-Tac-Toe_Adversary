@@ -2,9 +2,16 @@ import neat
 import time
 import os
 import sys
+import pickle
+from time import gmtime, strftime
 from fcntl import fcntl, F_GETFL, F_SETFL
 
-training_bots = ["tictactoe-starterbot-python3", "MonteCarloBot"]
+
+debug=True #turn off for real run
+if debug:
+    training_bots = ["tictactoe-starterbot-python3"]
+else:
+    training_bots = ["tictactoe-starterbot-python3", "MonteCarloBot"]
 
 def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
@@ -12,7 +19,10 @@ def eval_genomes(genomes, config):
 
 def eval_genome(genome, config):
     net = neat.nn.FeedForwardNetwork.create(genome, config)
-    num_reps = 30
+    if debug:
+        num_reps = 1
+    else:
+        num_reps = 30
     cumulative_fitness = 0
     for bot in training_bots:
         for _ in range(num_reps):
@@ -242,6 +252,12 @@ class EngineConnector:
             os.remove(self.interface_lock_path)
         os.remove(self.interface_pipe_path)
 
+def pickle_winner_net(net):
+    time_str = strftime("%Y-%m-%d-%H-%M", gmtime())
+    pickle_file = open(time_str + "_winner.pickle", "wb+")
+    pickle.dump(net, pickle_file)
+    pickle_file.close()
+
 def run(config_file):
     # Load configuration.
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
@@ -260,18 +276,19 @@ def run(config_file):
     p.add_reporter(checkpointer)
 
     # Run for up to 300 generations.
-    pe = neat.ParallelEvaluator(30, eval_genome)
-    winner = p.run(pe.evaluate, 150)
-    #pe = neat.ParallelEvaluator(2, eval_genome)
-    #winner = p.run(pe.evaluate, 1)
+    if debug:
+        pe = neat.ParallelEvaluator(2, eval_genome)
+        winner = p.run(pe.evaluate, 1)
+    else:
+        pe = neat.ParallelEvaluator(30, eval_genome)
+        winner = p.run(pe.evaluate, 150)
 
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
 
     # write the most fit nn
-    #winner_net = neat.nn.FeedForwardNetwork.create(winner, config)
-    #save the current generation as a checkpoint
-    checkpointer.save_checkpoint(config, p, winner, checkpointer.current_generation)
+    winner_net = neat.nn.FeedForwardNetwork.create(winner, config)
+    pickle_winner_net(winner_net)
 
 if __name__ == '__main__':
     # Determine path to configuration file. This path manipulation is

@@ -129,3 +129,4 @@ synchronize_folder_dl.sh
 GeneticAlgorithm/ga_error_log.txt
 /results/
 download_results.sh
+*.pickle
