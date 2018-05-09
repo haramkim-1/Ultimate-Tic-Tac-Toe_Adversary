@@ -9,10 +9,10 @@ from fcntl import fcntl, F_GETFL, F_SETFL
 
 debug=False #turn off for real run
 if debug:
-    training_bots = ["tictactoe-starterbot-python3/main.py"]
+    training_bots = [("tictactoe-starterbot-python3/main.py" , 50)]
 else:
     #training_bots = ["tictactoe-starterbot-python3", "MonteCarloBot"]
-    training_bots = ["tictactoe-starterbot-python3/main.py", "NNBot/main.py ../networks/versus_random_winner.pickle"]
+    training_bots = [("tictactoe-starterbot-python3/main.py", 50), ("NNBot/main.py ../networks/versus_random_winner.pickle", 1)]
 
 def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
@@ -20,16 +20,14 @@ def eval_genomes(genomes, config):
 
 def eval_genome(genome, config):
     net = neat.nn.FeedForwardNetwork.create(genome, config)
-    if debug:
-        num_reps = 1
-    else:
-        num_reps = 50
     cumulative_fitness = 0
-    for bot in training_bots:
-        for _ in range(num_reps):
+    game_count = 0
+    for bot,reps in training_bots:
+        for _ in range(reps):
             result = play_game(net, bot, False)
+            game_count += 1
             cumulative_fitness = cumulative_fitness + fitness(result, False)
-    fitness_float = cumulative_fitness / (num_reps * len(training_bots))
+    fitness_float = cumulative_fitness / game_count
     assert isinstance(fitness_float, float)
     return fitness_float
 
