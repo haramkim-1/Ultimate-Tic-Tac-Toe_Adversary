@@ -130,3 +130,4 @@ GeneticAlgorithm/ga_error_log.txt
 /results/
 download_results.sh
 *.pickle
+logs/
