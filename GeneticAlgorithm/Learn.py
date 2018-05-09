@@ -7,7 +7,7 @@ from time import gmtime, strftime
 from fcntl import fcntl, F_GETFL, F_SETFL
 
 
-debug=True #turn off for real run
+debug=False #turn off for real run
 if debug:
     training_bots = ["tictactoe-starterbot-python3"]
 else:
