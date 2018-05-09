@@ -10,7 +10,8 @@ class NeuralNetworkBot:
     def get_move(self, pos, tleft):
         lmoves = pos.legal_moves()
         #state tuple in style used by Learn
-        state_strs = (process_board(self.is_first, str(pos.get_board())), process_macroboard(self.is_first, str(pos.get_macroboard)), str(lmoves))
+        state_strs = (process_board(self.is_first, str(pos.get_board())), process_macroboard(self.is_first, str(pos.get_macroboard())), str(lmoves))
+        #raise Exception(str(state_strs))
         #find if we're first if not already detected
         if not self.order_detected:
             self.order_detected = True
@@ -65,12 +66,12 @@ def check_move_legal(moves_str, move):
 
 def process_board(first, pre_board):
         if first:
-            return pre_board.replace("1","m").replace("2","y")
+            return pre_board.replace("-1","a").replace("1","m").replace("2","y").replace("a","-1")
         else:
-            return pre_board.replace("2","m").replace("1","y")
+            return pre_board.replace("-1","a").replace("2","m").replace("1","y").replace("a","-1")
 
 def process_macroboard(first, pre_macroboard):
     if first:
-        return pre_macroboard.replace("1","m").replace("2","y")
+        return pre_macroboard.replace("-1","a").replace("1","m").replace("2","y").replace("a","-1")
     else:
-        return pre_macroboard.replace("2","m").replace("1","y")
+        return pre_macroboard.replace("-1","a").replace("2","m").replace("1","y").replace("a","-1")

@@ -33,8 +33,8 @@ if __name__ == '__main__':
     import pickle
 
     #logging
-    exn_log_path = ".."+ os.sep +"nnb_exn_log.log"
-    exn_log_lock_path = ".."+ os.sep +"nnb_exn_log.log.lock"
+    exn_log_path = ".."+ os.sep + "logs"+ os.sep +"nnb_exn_log.log"
+    exn_log_lock_path = ".."+ os.sep + "logs"+ os.sep +"nnb_exn_log.log.lock"
     exn_log_lock = FileLock(exn_log_lock_path)
 
     #extract path to checkpoint from CLI

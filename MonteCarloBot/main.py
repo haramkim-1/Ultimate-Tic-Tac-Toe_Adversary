@@ -29,8 +29,8 @@ if __name__ == '__main__':
     import os
     import traceback
 
-    exn_log_path = ".."+ os.sep +"mcb_exn_log.log"
-    exn_log_lock_path = ".."+ os.sep +"mcb_exn_log.log.lock"
+    exn_log_path = ".."+ os.sep + "logs"+ os.sep +"mcb_exn_log.log"
+    exn_log_lock_path = ".."+ os.sep + "logs"+ os.sep +"mcb_exn_log.log.lock"
     exn_log_lock = FileLock(exn_log_lock_path)
 
     pos = Position()

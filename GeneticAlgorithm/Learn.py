@@ -7,7 +7,7 @@ from time import gmtime, strftime
 from fcntl import fcntl, F_GETFL, F_SETFL
 
 
-debug=False #turn off for real run
+debug=True #turn off for real run
 if debug:
     training_bots = ["tictactoe-starterbot-python3"]
 else:
@@ -223,15 +223,15 @@ class EngineConnector:
 
     def process_board(self, pre_board):
         if self.is_first:
-            return pre_board.replace("1","m").replace("2","y")
+            return pre_board.replace("-1","a").replace("1","m").replace("2","y").replace("a","-1")
         else:
-            return pre_board.replace("2","m").replace("1","y")
+            return pre_board.replace("-1","a").replace("2","m").replace("1","y").replace("a","-1")
 
     def process_macroboard(self, pre_macroboard):
         if self.is_first:
-            return pre_macroboard.replace("1","m").replace("2","y")
+            return pre_macroboard.replace("-1","a").replace("1","m").replace("2","y").replace("a","-1")
         else:
-            return pre_macroboard.replace("2","m").replace("1","y")
+            return pre_macroboard.replace("-1","a").replace("2","m").replace("1","y").replace("a","-1")
 
     # return 0 if draw, 1 if player 1 wins, 2 if player 2 wins, -1 if active game
     def win_status(self):
