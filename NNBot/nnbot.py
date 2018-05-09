@@ -20,7 +20,7 @@ class NeuralNetworkBot:
         nn_move = get_move_from_net(self.neuralnet, state_strs)
         #pick move from lmoves
         lmoves_strings = [str(x) for x in lmoves]
-        return lmoves[lmoves_strings.index(nn_move)]
+        return lmoves[lmoves_strings.index(str(nn_move))]
 
 #function transposed from Learn; extracts move from the neural network
 def get_move_from_net(net, state):

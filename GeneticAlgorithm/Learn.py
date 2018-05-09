@@ -9,10 +9,10 @@ from fcntl import fcntl, F_GETFL, F_SETFL
 
 debug=False #turn off for real run
 if debug:
-    training_bots = ["tictactoe-starterbot-python3"]
+    training_bots = ["tictactoe-starterbot-python3/main.py"]
 else:
     #training_bots = ["tictactoe-starterbot-python3", "MonteCarloBot"]
-    training_bots = ["tictactoe-starterbot-python3"]
+    training_bots = ["tictactoe-starterbot-python3/main.py", "NNBot/main.py ../networks/versus_random_winner.pickle"]
 
 def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
@@ -23,7 +23,7 @@ def eval_genome(genome, config):
     if debug:
         num_reps = 1
     else:
-        num_reps = 30
+        num_reps = 50
     cumulative_fitness = 0
     for bot in training_bots:
         for _ in range(num_reps):
@@ -147,7 +147,7 @@ class EngineConnector:
         pipe.close()
 
         #run engine
-        otherbot_launch_str = "python3 .."+ os.sep + otherbot_path + os.sep +"main.py"
+        otherbot_launch_str = "python3 .."+ os.sep + otherbot_path
         ibot_launch_str = "python3 .."+ os.sep +"EngineInterface"+ os.sep +"main.py " + self.interface_pipe_path
 
         if is_first:
