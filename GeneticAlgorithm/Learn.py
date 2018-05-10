@@ -9,10 +9,10 @@ from fcntl import fcntl, F_GETFL, F_SETFL
 
 debug=False #turn off for real run
 if debug:
-    training_bots = [("tictactoe-starterbot-python3/main.py" , 50)]
+    training_bots = [("python3 .." + os.sep + "tictactoe-starterbot-python3/main.py", 1, 1), ("python3 .." + os.sep + "NNBot/main.py ../networks/versus_random_winner.pickle", 1, 10), ("java -Duser.dir=.."+os.sep+"external_javabot"+os.sep+"bin BotStarter", 1, 15)]
 else:
     #training_bots = ["tictactoe-starterbot-python3", "MonteCarloBot"]
-    training_bots = [("tictactoe-starterbot-python3/main.py", 20), ("NNBot/main.py ../networks/versus_random_winner.pickle", 1)]
+    training_bots = [("python3 .." + os.sep + "tictactoe-starterbot-python3/main.py", 30, 1), ("python3 .." + os.sep + "NNBot/main.py ../networks/versus_random_winner.pickle", 1, 10), ("java -Duser.dir=.."+os.sep+"external_javabot"+os.sep+"bin BotStarter", 1, 15)]
 
 def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
@@ -22,11 +22,11 @@ def eval_genome(genome, config):
     net = neat.nn.FeedForwardNetwork.create(genome, config)
     cumulative_fitness = 0
     game_count = 0
-    for bot,reps in training_bots:
+    for bot,reps,weight in training_bots:
         for _ in range(reps):
             result = play_game(net, bot, False)
-            game_count += 1
-            cumulative_fitness = cumulative_fitness + fitness(result, False)
+            game_count += (1 * weight)
+            cumulative_fitness += fitness(result, False) * weight
     fitness_float = cumulative_fitness / game_count
     assert isinstance(fitness_float, float)
     return fitness_float
@@ -145,13 +145,12 @@ class EngineConnector:
         pipe.close()
 
         #run engine
-        otherbot_launch_str = "python3 .."+ os.sep + otherbot_path
         ibot_launch_str = "python3 .."+ os.sep +"EngineInterface"+ os.sep +"main.py " + self.interface_pipe_path
 
         if is_first:
-            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ ibot_launch_str +"\" \"" + otherbot_launch_str + "\""
+            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ ibot_launch_str +"\" \"" + otherbot_path + "\""
         else:
-            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ otherbot_launch_str +"\" \"" + ibot_launch_str + "\""
+            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ otherbot_path +"\" \"" + ibot_launch_str + "\""
         self.engine_process = subprocess.Popen(engine_launch_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=".."+ os.sep +"ultimatetictactoe-engine")
         #avoid blocking by setting flags
         flags = fcntl(self.engine_process.stdout, F_GETFL)
@@ -233,7 +232,6 @@ class EngineConnector:
 
     # return 0 if draw, 1 if player 1 wins, 2 if player 2 wins, -1 if active game
     def win_status(self):
-        #print("win_status called")
         l = self.engine_process.stdout.readline().decode(sys.getdefaultencoding())
         while l != "":
             #print("l:" + l)
