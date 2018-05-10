@@ -1,6 +1,6 @@
 
 class Position:
-    
+
     def __init__(self):
         self.board = []
         self.macroboard = []
@@ -9,28 +9,28 @@ class Position:
 
     def __str__(self):
         return ",".join(map(lambda x:str(x),self.board))
-    
+
     def parse_field(self, fstr):
         flist = fstr.replace(';', ',').split(',')
         self.board = [ int(f) for f in flist ]
-    
+
     def parse_macroboard(self, mbstr):
         mblist = mbstr.replace(';', ',').split(',')
         self.macroboard = [ int(f) for f in mblist ]
-    
+
     def is_legal(self, x, y):
         mbx, mby = x//3, y//3
         return self.macroboard[3*mby+mbx] == -1 and self.board[9*y+x] == 0
 
     def legal_moves(self):
         return [ (x, y) for x in range(9) for y in range(9) if self.is_legal(x, y) ]
-        
+
     def make_move(self, move, pid):
         x, y = move
         self.mLastX, self.mLastY = move
         self.board[9*y+x] = pid
         self.updateMacroboard()
-        
+
     def get_board(self):
         return str.join(",", [str(i) for i in self.board])
 
