@@ -133,3 +133,4 @@ download_results.sh
 logs/
 ultimatetictactoe-engine/run_nnb_test.sh
 NNBot/run_nnb_test.sh
+external_javabot/
