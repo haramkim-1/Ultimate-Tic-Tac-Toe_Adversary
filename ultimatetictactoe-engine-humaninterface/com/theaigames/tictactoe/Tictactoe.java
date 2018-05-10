@@ -3,6 +3,7 @@ package com.theaigames.tictactoe;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.theaigames.engine.io.Bot;
 import com.theaigames.engine.io.IOPlayer;
 import com.theaigames.game.AbstractGame;
 import com.theaigames.tictactoe.field.Field;
@@ -15,31 +16,31 @@ public class Tictactoe extends AbstractGame {
 	private List<Player> players;
 
 	@Override
-	public void setupGame(ArrayList<IOPlayer> ioPlayers) throws Exception {
+	public void setupGame(ArrayList<Bot> players) throws Exception {
 
 		System.out.println("Setting up game...");
 
 		// create all the players and everything they need
 		this.players = new ArrayList<>();
-		
+
 		// create the playing field
 		Field mField = new Field();
-		
-		for(int i=0; i<ioPlayers.size(); i++) {
+
+		for(int i=0; i<players.size(); i++) {
 			// create the player
 			String playerName = String.format("player%d", i+1);
-			Player player = new Player(playerName, ioPlayers.get(i), TIMEBANK_MAX, TIME_PER_MOVE, i+1);
+			Player player = new Player(playerName, players.get(i), TIMEBANK_MAX, TIME_PER_MOVE, i+1);
 			this.players.add(player);
 
 		}
 		this.players.forEach(this::sendSettings);
-		
+
 		// create the processor
 		super.processor = new Processor(this.players, mField, LOG_MOVES);
 	}
 
 	private void sendSettings(Player player) {
-		String playerString = this.players.get(0).getName() + "," + this.players.get(1).getName();
+		String playerString = "player1,player2";
 
 		player.sendSetting("timebank", TIMEBANK_MAX);
 		player.sendSetting("time_per_move", TIME_PER_MOVE);

@@ -29,7 +29,7 @@ import java.io.OutputStreamWriter;
  * 
  * @author Jackie Xu <jackie@starapple.nl>, Jim van Eeden <jim@starapple.nl>
  */
-public class IOPlayer implements Runnable {
+public class IOPlayer implements Runnable, Bot {
     
     private Process process;
     private OutputStreamWriter inputStream;
@@ -162,10 +162,7 @@ public class IOPlayer implements Runnable {
 		dump.append(dumpy + "\n");
 	}
     
-    /**
-     * Add a warning to the bot's dump that the engine outputs
-     * @param warning : the warning message
-     */
+    @Override
     public void outputEngineWarning(String warning) {
     	dump.append(String.format("Engine warning: \"%s\"\n", warning));
     }
