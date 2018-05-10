@@ -271,7 +271,7 @@ def run(config_file):
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
-    checkpointer = neat.Checkpointer(generation_interval=20)
+    checkpointer = neat.Checkpointer(generation_interval=50)
     p.add_reporter(checkpointer)
 
     # Run for up to 300 generations.
