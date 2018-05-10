@@ -12,7 +12,7 @@ if debug:
     training_bots = [("tictactoe-starterbot-python3/main.py" , 50)]
 else:
     #training_bots = ["tictactoe-starterbot-python3", "MonteCarloBot"]
-    training_bots = [("tictactoe-starterbot-python3/main.py", 50), ("NNBot/main.py ../networks/versus_random_winner.pickle", 1)]
+    training_bots = [("tictactoe-starterbot-python3/main.py", 20), ("NNBot/main.py ../networks/versus_random_winner.pickle", 1)]
 
 def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
@@ -271,7 +271,7 @@ def run(config_file):
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
-    checkpointer = neat.Checkpointer(generation_interval=10)
+    checkpointer = neat.Checkpointer(generation_interval=20)
     p.add_reporter(checkpointer)
 
     # Run for up to 300 generations.
