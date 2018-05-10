@@ -2,9 +2,17 @@ import neat
 import time
 import os
 import sys
+import pickle
+from time import gmtime, strftime
 from fcntl import fcntl, F_GETFL, F_SETFL
 
-training_bots = ["tictactoe-starterbot-python3"]
+
+debug=False #turn off for real run
+if debug:
+    training_bots = [("python3 .." + os.sep + "tictactoe-starterbot-python3/main.py", 1, 1), ("python3 .." + os.sep + "NNBot/main.py ../networks/versus_random_winner.pickle", 1, 10), ("java -Duser.dir=.."+os.sep+"external_javabot"+os.sep+"bin BotStarter", 1, 15)]
+else:
+    #training_bots = ["tictactoe-starterbot-python3", "MonteCarloBot"]
+    training_bots = [("python3 .." + os.sep + "tictactoe-starterbot-python3/main.py", 30, 1), ("python3 .." + os.sep + "NNBot/main.py ../networks/versus_random_winner.pickle", 1, 10), ("java -Duser.dir=.."+os.sep+"external_javabot"+os.sep+"bin BotStarter", 1, 15)]
 
 def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
@@ -12,13 +20,14 @@ def eval_genomes(genomes, config):
 
 def eval_genome(genome, config):
     net = neat.nn.FeedForwardNetwork.create(genome, config)
-    num_reps = 30
     cumulative_fitness = 0
-    for bot in training_bots:
-        for _ in range(num_reps):
+    game_count = 0
+    for bot,reps,weight in training_bots:
+        for _ in range(reps):
             result = play_game(net, bot, False)
-            cumulative_fitness = cumulative_fitness + fitness(result, False)
-    fitness_float = cumulative_fitness / (num_reps * len(training_bots))
+            game_count += (1 * weight)
+            cumulative_fitness += fitness(result, False) * weight
+    fitness_float = cumulative_fitness / game_count
     assert isinstance(fitness_float, float)
     return fitness_float
 
@@ -136,13 +145,12 @@ class EngineConnector:
         pipe.close()
 
         #run engine
-        otherbot_launch_str = "python3 .."+ os.sep + otherbot_path + os.sep +"main.py"
         ibot_launch_str = "python3 .."+ os.sep +"EngineInterface"+ os.sep +"main.py " + self.interface_pipe_path
 
         if is_first:
-            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ ibot_launch_str +"\" \"" + otherbot_launch_str + "\""
+            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ ibot_launch_str +"\" \"" + otherbot_path + "\""
         else:
-            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ otherbot_launch_str +"\" \"" + ibot_launch_str + "\""
+            engine_launch_str = "java -cp bin com.theaigames.tictactoe.Tictactoe \""+ otherbot_path +"\" \"" + ibot_launch_str + "\""
         self.engine_process = subprocess.Popen(engine_launch_str, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=".."+ os.sep +"ultimatetictactoe-engine")
         #avoid blocking by setting flags
         flags = fcntl(self.engine_process.stdout, F_GETFL)
@@ -212,20 +220,18 @@ class EngineConnector:
 
     def process_board(self, pre_board):
         if self.is_first:
-            return pre_board.replace("1","m").replace("2","y")
+            return pre_board.replace("-1","a").replace("1","m").replace("2","y").replace("a","-1")
         else:
-            return pre_board.replace("2","m").replace("1","y")
+            return pre_board.replace("-1","a").replace("2","m").replace("1","y").replace("a","-1")
 
-    #TODO: fix
     def process_macroboard(self, pre_macroboard):
         if self.is_first:
-            return pre_macroboard.replace("1","m").replace("2","y")
+            return pre_macroboard.replace("-1","a").replace("1","m").replace("2","y").replace("a","-1")
         else:
-            return pre_macroboard.replace("2","m").replace("1","y")
+            return pre_macroboard.replace("-1","a").replace("2","m").replace("1","y").replace("a","-1")
 
     # return 0 if draw, 1 if player 1 wins, 2 if player 2 wins, -1 if active game
     def win_status(self):
-        #print("win_status called")
         l = self.engine_process.stdout.readline().decode(sys.getdefaultencoding())
         while l != "":
             #print("l:" + l)
@@ -243,6 +249,12 @@ class EngineConnector:
             os.remove(self.interface_lock_path)
         os.remove(self.interface_pipe_path)
 
+def pickle_winner_net(net):
+    time_str = strftime("%Y-%m-%d-%H-%M", gmtime())
+    pickle_file = open(time_str + "_winner.pickle", "wb+")
+    pickle.dump(net, pickle_file)
+    pickle_file.close()
+
 def run(config_file):
     # Load configuration.
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
@@ -257,22 +269,24 @@ def run(config_file):
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
-    checkpointer = neat.Checkpointer(generation_interval=10)
+    checkpointer = neat.Checkpointer(generation_interval=50)
     p.add_reporter(checkpointer)
 
     # Run for up to 300 generations.
-    pe = neat.ParallelEvaluator(30, eval_genome)
-    winner = p.run(pe.evaluate, 150)
-    #pe = neat.ParallelEvaluator(2, eval_genome)
-    #winner = p.run(pe.evaluate, 1)
-    #winner = p.run(eval_genomes, 1)
+    if debug:
+        pe = neat.ParallelEvaluator(2, eval_genome)
+        winner = p.run(pe.evaluate, 1)
+    else:
+        pe = neat.ParallelEvaluator(30, eval_genome)
+        winner = p.run(pe.evaluate, 150)
 
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
 
     # write the most fit nn
-    #winner_net = neat.nn.FeedForwardNetwork.create(winner, config)
-    #checkpointer.save_checkpoint(config, p, checkpointer.current_generation)
+    checkpointer.save_checkpoint(config, p, winner, checkpointer.current_generation)
+    winner_net = neat.nn.FeedForwardNetwork.create(winner, config)
+    pickle_winner_net(winner_net)
 
 if __name__ == '__main__':
     # Determine path to configuration file. This path manipulation is

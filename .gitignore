@@ -129,3 +129,8 @@ synchronize_folder_dl.sh
 GeneticAlgorithm/ga_error_log.txt
 /results/
 download_results.sh
+*.pickle
+logs/
+ultimatetictactoe-engine/run_nnb_test.sh
+NNBot/run_nnb_test.sh
+external_javabot/

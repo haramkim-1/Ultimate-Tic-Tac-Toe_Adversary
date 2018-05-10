@@ -1,4 +1,4 @@
-from montecarlobot import MonteCarloBot
+
 def parse_command(instr, bot, pos):
     if instr.startswith('action move'):
         time = int(instr.split(' ')[-1])
@@ -25,33 +25,16 @@ def parse_command(instr, bot, pos):
 if __name__ == '__main__':
     import sys
     from position import Position
-    from filelock import FileLock
-    import os
-    import traceback
-
-    exn_log_path = ".."+ os.sep + "logs"+ os.sep +"mcb_exn_log.log"
-    exn_log_lock_path = ".."+ os.sep + "logs"+ os.sep +"mcb_exn_log.log.lock"
-    exn_log_lock = FileLock(exn_log_lock_path)
+    from randombot import RandomBot
 
     pos = Position()
-    bot = MonteCarloBot()
+    bot = RandomBot()
     
-    try:
-        while True:
-            try:
-                instr = input()
-            except Exception as e:
-                sys.stderr.write('error reading input')
-            outstr = parse_command(instr, bot, pos)
-            sys.stdout.write(outstr)
-            sys.stdout.flush()
-    except Exception as e:
+    while True:
         try:
-            exn_log_lock.acquire()
-            exn_log = open(exn_log_path, "a+")
-            exn_log.write(str(e) + "\n")
-            exn_log.write(str(traceback.format_exc()))
-            exn_log.close()
-        finally:
-            exn_log_lock.release()
-            
+            instr = input()       
+        except Exception as e:
+            sys.stderr.write('error reading input')
+        outstr = parse_command(instr, bot, pos)
+        sys.stdout.write(outstr)
+        sys.stdout.flush()   
