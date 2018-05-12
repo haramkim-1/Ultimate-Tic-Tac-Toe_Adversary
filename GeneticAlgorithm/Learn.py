@@ -12,7 +12,7 @@ if debug:
     training_bots = [("python3 .." + os.sep + "tictactoe-starterbot-python3/main.py", 1, 1), ("python3 .." + os.sep + "NNBot/main.py ../networks/versus_random_winner.pickle", 1, 10), ("java -Duser.dir=.."+os.sep+"external_javabot"+os.sep+"bin BotStarter", 1, 15)]
 else:
     #training_bots = ["tictactoe-starterbot-python3", "MonteCarloBot"]
-    training_bots = [("python3 .." + os.sep + "tictactoe-starterbot-python3/main.py", 30, 1), ("python3 .." + os.sep + "NNBot/main.py ../networks/versus_random_winner.pickle", 1, 10), ("java -Duser.dir=.."+os.sep+"external_javabot"+os.sep+"bin BotStarter", 1, 15)]
+    training_bots = [("python3 .." + os.sep + "tictactoe-starterbot-python3/main.py", 30, 1), ("python3 .." + os.sep + "NNBot/main.py ../networks/versus_minimax_external_winner.pickle", 1, 15), ("python3 .." + os.sep + "NNBot/main.py ../networks/versus_random_winner.pickle", 1, 10), ("java -Duser.dir=.."+os.sep+"external_javabot"+os.sep+"bin BotStarter", 1, 15)]
 
 def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
