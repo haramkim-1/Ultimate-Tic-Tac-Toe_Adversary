@@ -18,7 +18,8 @@ class Position:
         return self.macroboard[3*mby+mbx] == -1 and self.board[9*y+x] == 0
 
     def legal_moves(self):
-        return [(x, y) for x in range(9) for y in range(9) if self.is_legal(x, y)]
+        return [(x, y) for x in range(9) for y in range(9)
+                if self.is_legal(x, y)]
 
     def make_move(self, x, y, pid):
         mbx, mby = x//3, y//3
@@ -60,16 +61,16 @@ class Position:
         startX = macroY*3
         for x in range(startX, startX+3):
             if (self.board[startY*9+x] == self.board[(startY+1)*9+x] and
-                    self.board[(startY+1)*9+x] == self.board[(startY+2)*9+x] and
-                    self.board[(startY)*9+x] > 0):
+                    self.board[(startY+1)*9+x] == self.board[(startY+2)*9+x]
+                    and self.board[(startY)*9+x] > 0):
                 return self.board[startY*9+x]
         for y in range(startY, startY+3):
             if (self.board[y*9+startX] == self.board[y*9+startX+1] and
                     self.board[y*9+startX+1] == self.board[y*9+startX+2] and
                     self.board[y*9+startX] > 0):
                 return self.board[y*9+startX]
-        if (self.board[startY*9+startX] == self.board[(startY+1)*9+startX+1] and
-                self.board[(startY+1)*9+startX+1] ==
+        if (self.board[startY*9+startX] == self.board[(startY+1)*9+startX+1]
+                and self.board[(startY+1)*9+startX+1] ==
                 self.board[(startY+2)*9+startX+2] and
                 self.board[startY*9+startX] > 0):
             return self.board[startY*9+startX]
