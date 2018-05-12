@@ -7,7 +7,7 @@ from time import gmtime, strftime
 from fcntl import fcntl, F_GETFL, F_SETFL
 
 
-debug=True#turn off for real run
+debug=False#turn off for real run
 if debug:
     training_bots = [("python3 .." + os.sep + "tictactoe-starterbot-python3/main.py", 1, 1), ("python3 .." + os.sep + "NNBot/main.py ../networks/versus_random_winner.pickle", 1, 10), ("java -Duser.dir=.."+os.sep+"external_javabot"+os.sep+"bin BotStarter", 1, 15)]
 else:
@@ -39,10 +39,10 @@ def fitness(game_res, is_first):
         if is_first:
             return 1
         else:
-            return 0
+            return 0 + game_res[1]/80
     elif game_res[0] == 2: #player 2 wins
         if is_first:
-            return 0
+            return 0 + game_res[1]/80
         else:
             return 1
     else:
@@ -282,7 +282,7 @@ def run(config_file):
         winner = p.run(pe.evaluate, 1)
     else:
         pe = neat.ParallelEvaluator(30, eval_genome)
-        winner = p.run(pe.evaluate, 150)
+        winner = p.run(pe.evaluate, 1000)
 
     # Display the winning genome.
     print('\nBest genome:\n{!s}'.format(winner))
