@@ -25,6 +25,7 @@ import java.util.List;
 
 import com.theaigames.engine.Engine;
 import com.theaigames.engine.Logic;
+import com.theaigames.engine.io.Bot;
 import com.theaigames.engine.io.IOPlayer;
 import com.theaigames.game.player.AbstractPlayer;
 
@@ -45,11 +46,12 @@ public abstract class AbstractGame implements Logic {
 	public GameHandler processor;
 	
 	public int maxRounds;
+	public int botId;
 	
 	public boolean DEV_MODE = false; // turn this on for local testing
 	public String TEST_BOT; // command for the test bot in DEV_MODE
 	public int NUM_TEST_BOTS; // number of bots for this game
-	protected boolean LOG_MOVES = true; // whether game/player messages should be logged. Modification.
+	protected boolean LOG_MOVES = false; // whether game/player messages should be logged. Modification.
 	
 	public AbstractGame() {
 		maxRounds = -1; // set this later if there is a maximum amount of rounds for this game
@@ -82,27 +84,23 @@ public abstract class AbstractGame implements Logic {
             return;
         }
 
-        // add the bots from the arguments if not in DEV_MODE
-        List<String> botDirs = new ArrayList<>();
-        List<String> botIds = new ArrayList<>();
-
 		if (args.length <= 0) {
 			throw new RuntimeException("No arguments provided.");
+		} else if (args.length != 2) {
+			throw new RuntimeException("Incorrect number of arguments provided.");
 		}
 
-		for (int i=0; i < args.length; i++) {
-			botIds.add(i + "");
-			botDirs.add(args[i]);
+		try {
+			botId = Integer.parseInt(args[0]);
+		} catch (NumberFormatException e) {
+			throw new RuntimeException("Argument 1 is not an integer.");
 		}
-        
-        // check is the starting arguments are passed correctly
-        if (botIds.isEmpty() || botDirs.isEmpty() || botIds.size() != botDirs.size())
-            throw new RuntimeException("Missing some arguments.");
+		if (botId != 1 && botId != 2) {
+			throw new RuntimeException("Argument 1 is not 1 or 2.");
+		}
 
 		// add the players
-		for(int i=0; i < botIds.size(); i++) {
-			this.engine.addPlayer(botDirs.get(i), botIds.get(i), LOG_MOVES);
-		}
+		this.engine.addPlayer(args[1], botId + "", LOG_MOVES);
 	}
 	
 	/**
@@ -127,8 +125,10 @@ public abstract class AbstractGame implements Logic {
 	@Override
     public void playRound(int roundNumber) 
 	{
-		for(IOPlayer ioPlayer : this.engine.getPlayers())
-			ioPlayer.addToDump(String.format("Round %d", roundNumber));
+		for(Bot player : this.engine.getPlayers()) {
+			if (player instanceof IOPlayer)
+				((IOPlayer) player).addToDump(String.format("Round %d", roundNumber));
+		}
 		
 		this.processor.playRound(roundNumber);
 	}
@@ -140,7 +140,10 @@ public abstract class AbstractGame implements Logic {
 	public void finish() throws Exception
 	{
 		// stop the bots
-		this.engine.getPlayers().forEach(IOPlayer::finish);
+		for (Bot p : this.engine.getPlayers()) {
+			if (p instanceof IOPlayer)
+				((IOPlayer) p).finish();
+		}
 		Thread.sleep(100);
 		
 		if (DEV_MODE) { // print the game file when in DEV_MODE
@@ -167,7 +170,7 @@ public abstract class AbstractGame implements Logic {
 		if (winner == null)
 			System.out.println("Draw!");
 		else
-			System.out.println("winner: " + this.processor.getWinner().getName());
+			System.out.println("winner: " + this.processor.getWinner());
 
 		// save results to file here
 		String playedGame = this.processor.getPlayedGame();

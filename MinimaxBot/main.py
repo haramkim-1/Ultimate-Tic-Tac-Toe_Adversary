@@ -16,25 +16,25 @@ def parse_command(instr, bot, pos):
         myid = int(instr.split(' ')[-1])
         bot.myid = myid
         bot.oppid = 1 if myid == 2 else 2
-    elif instr.startswith('settings timebank'): 
+    elif instr.startswith('settings timebank'):
         bot.timebank = int(instr.split(' ')[-1])
-    elif instr.startswith('settings time_per_move'): 
+    elif instr.startswith('settings time_per_move'):
         bot.time_per_move = int(instr.split(' ')[-1])
     return ''
 
 if __name__ == '__main__':
     import sys
     from position import Position
-    from randombot import RandomBot
+    from minimaxbot import MinimaxBot
 
     pos = Position()
-    bot = RandomBot()
-    
+    bot = MinimaxBot()
+
     while True:
         try:
-            instr = input()       
+            instr = input()
         except Exception as e:
             sys.stderr.write('error reading input')
         outstr = parse_command(instr, bot, pos)
         sys.stdout.write(outstr)
-        sys.stdout.flush()   
+        sys.stdout.flush()
