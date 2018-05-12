@@ -1,4 +1,5 @@
 import copy
+import sys
 
 
 class MinimaxBot:
@@ -10,8 +11,7 @@ class MinimaxBot:
         lmoves = pos.legal_moves()
         # TODO: initialize this to the first move in lmoves?
         best_move = None
-        # TODO: find a good initial value
-        best_val = None
+        best_val = -sys.maxsize - 1
         # for each move, find minimax value and if greater than the best val,
         # change the best move and best val to this current move and value
         for move in lmoves:
@@ -21,6 +21,7 @@ class MinimaxBot:
                 best_val = curr_val
         return best_move
 
+    # returns minimax value of a move
     def minimax(self, move, pos, depth, max_depth, my_turn):
         # if my turn, max
         # TODO check depth condition and if not met, use heuristic
