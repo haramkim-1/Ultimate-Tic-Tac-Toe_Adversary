@@ -7,12 +7,12 @@ from time import gmtime, strftime
 from fcntl import fcntl, F_GETFL, F_SETFL
 
 
-debug=False #turn off for real run
+debug=True#turn off for real run
 if debug:
     training_bots = [("python3 .." + os.sep + "tictactoe-starterbot-python3/main.py", 1, 1), ("python3 .." + os.sep + "NNBot/main.py ../networks/versus_random_winner.pickle", 1, 10), ("java -Duser.dir=.."+os.sep+"external_javabot"+os.sep+"bin BotStarter", 1, 15)]
 else:
     #training_bots = ["tictactoe-starterbot-python3", "MonteCarloBot"]
-    training_bots = [("python3 .." + os.sep + "tictactoe-starterbot-python3/main.py", 30, 1), ("python3 .." + os.sep + "NNBot/main.py ../networks/versus_minimax_external_winner.pickle", 1, 15), ("python3 .." + os.sep + "NNBot/main.py ../networks/versus_random_winner.pickle", 1, 10), ("java -Duser.dir=.."+os.sep+"external_javabot"+os.sep+"bin BotStarter", 1, 15)]
+    training_bots = [("python3 .." + os.sep + "tictactoe-starterbot-python3/main.py", 30, 1), ("python3 .." + os.sep + "NNBot/main.py ../networks/versus_minimax_external_winner.pickle", 1, 2), ("python3 .." + os.sep + "NNBot/main.py ../networks/versus_random_winner.pickle", 1, 2), ("java -Duser.dir=.."+os.sep+"external_javabot"+os.sep+"bin BotStarter", 1, 2)]
 
 def eval_genomes(genomes, config):
     for genome_id, genome in genomes:
@@ -123,10 +123,14 @@ def get_move_from_net(net, state):
     nn_output = net.activate(nn_input)
     moves = range(0,81)
     moves = sorted(moves, key=lambda x:nn_output[x], reverse=True)
+    return (moves[0]%9, moves[0]//9)
+    #disabled move legality check
+    """
     for i in range(0,81):
         if check_move_legal(state[2], (moves[i]%9, moves[i]//9)):
             return (moves[i]%9, moves[i]//9)
     assert False
+    """
 
 class EngineConnector:
     def __init__(self, otherbot_path, is_first):
