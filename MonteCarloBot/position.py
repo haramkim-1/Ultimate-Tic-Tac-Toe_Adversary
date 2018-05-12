@@ -8,7 +8,7 @@ class Position:
         self.mLastY = -1
 
     def __str__(self):
-        return ",".join(map(lambda x:str(x),self.board))
+        return "Position: " + ",".join(map(lambda x:str(x),self.board))
 
     def parse_field(self, fstr):
         flist = fstr.replace(';', ',').split(',')
