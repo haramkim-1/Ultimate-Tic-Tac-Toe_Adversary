@@ -49,7 +49,11 @@ class MonteCarloBot:
         weights = [0]*l
         total = 0
         for i in range(0,l):
-            m = node.moves[moves[i]]
+            assert node.moves
+            try:
+                m = node.moves[moves[i]]
+            except Exception as e:
+                raise Exception(str(node.moves.keys()) + "\n\n\n" + str(moves))
             weights[i] = m.wins[turn]/m.trials
             total = total + weights[i]
         weights = [i/total for i in weights]
@@ -75,6 +79,8 @@ class MonteCarloBot:
         root.wins[self.oppid] = 1
         #print("\n\n\niterating\n\n\n")
         for i in range(0,iterations):
+            if i > 0:
+                raise Exception("abc")
             #print("\n\n\nrunning iteration: "+ str(i) + "\n\n\n")
             self.monte_carlo_iter(copy.deepcopy(pos), root, self.myid)
         
@@ -85,7 +91,7 @@ class MonteCarloBot:
     def get_move(self, pos, tleft):
         #return self.monte_carlo(pos, 1000)
         #print("GET MOVE RUNNING")
-        return self.monte_carlo(pos, 500)
+        return self.monte_carlo(pos, 5)
 
         #lmoves = pos.legal_moves()
         #rm = randint(0, len(lmoves)-1)
