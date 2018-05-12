@@ -123,14 +123,13 @@ def get_move_from_net(net, state):
     nn_output = net.activate(nn_input)
     moves = range(0,81)
     moves = sorted(moves, key=lambda x:nn_output[x], reverse=True)
-    return (moves[0]%9, moves[0]//9)
-    #disabled move legality check
-    """
-    for i in range(0,81):
+    
+    #move legality check for 1st 10
+    for i in range(0,10):
         if check_move_legal(state[2], (moves[i]%9, moves[i]//9)):
             return (moves[i]%9, moves[i]//9)
-    assert False
-    """
+    return (moves[0]%9, moves[0]//9)
+
 
 class EngineConnector:
     def __init__(self, otherbot_path, is_first):
