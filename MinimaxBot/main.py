@@ -1,7 +1,15 @@
+#
+# def print_legal_moves(pos):
+#     moves = pos.legal_moves()
+#     for move in moves:
+#         sys.stdout.write("legal moves: " + move[0] + ", " + move[1])
+#         sys.stdout.flush()
+
 
 def parse_command(instr, bot, pos):
     if instr.startswith('action move'):
         time = int(instr.split(' ')[-1])
+        # print_legal_moves(pos)
         x, y = bot.get_move(pos, time)
         return 'place_move %d %d\n' % (x, y)
     elif instr.startswith('update game field'):
@@ -21,6 +29,7 @@ def parse_command(instr, bot, pos):
     elif instr.startswith('settings time_per_move'):
         bot.time_per_move = int(instr.split(' ')[-1])
     return ''
+
 
 if __name__ == '__main__':
     import sys
