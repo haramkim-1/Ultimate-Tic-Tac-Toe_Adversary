@@ -46,6 +46,7 @@ class Position:
 
     # return number of microboards won by me if my_turn is true and number of
     # microboards won by opponent if my_turn is false
+    #TODO: this counts draws as wins for the opponent
     def num_boards_won(self, myid, my_turn):
         won = 0
         for x in range(0, 2):

@@ -30,7 +30,12 @@ class MinimaxBot:
         # TODO check depth condition and if not met, use heuristic
         if depth == max_depth:
             # heuristic: return number of boards won by whoever's turn it is
-            return pos.sum_heuristics(self.myid, my_turn)
+            return pos.sum_heuristics(self.myid, self.oppid)
+
+        # if game is won, return appropriate value
+        winner = pos.checkMacroboardWinner()
+        if winner != 0:
+            return pos.sum_heuristics
 
         # make a copy of the current position so we can make moves on it
         pos_copy = copy.deepcopy(pos)
@@ -40,7 +45,7 @@ class MinimaxBot:
         # if no legal moves, i.e. at a terminal node, return num of boards won
         # by player whose turn it is
         if lmoves == []:
-            return pos_copy.sum_heuristics(self.myid, my_turn)
+            return pos_copy.sum_heuristics(self.myid, self.oppid)
 
         # for each of these possible next moves, make the move using pos copy
         pos_copy.make_move(move[0], move[1], self.myid)
