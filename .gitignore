@@ -134,3 +134,7 @@ logs/
 ultimatetictactoe-engine/run_nnb_test.sh
 NNBot/run_nnb_test.sh
 external_javabot/
+*.svg
+*.gv
+*.png
+.DS_Store

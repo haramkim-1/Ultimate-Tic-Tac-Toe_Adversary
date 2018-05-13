@@ -47,6 +47,8 @@ if __name__ == '__main__':
             sys.stdout.flush()
     except Exception as e:
         try:
+            print(str(e) + "\n")
+            print(str(traceback.format_exc()))
             exn_log_lock.acquire()
             exn_log = open(exn_log_path, "a+")
             exn_log.write(str(e) + "\n")

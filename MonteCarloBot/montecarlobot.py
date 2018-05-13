@@ -32,7 +32,7 @@ class MonteCarloBot:
 
     def monte_carlo_iter(self, pos, node, turn):
         vic = pos.checkMacroboardWinner()
-        print(pos)
+        #print(pos)
         if vic == self.myid:
             return Victory.WIN
         elif vic == self.oppid:
@@ -44,12 +44,16 @@ class MonteCarloBot:
         if not node.moves:
             for i in moves:
                 node.moves[i] = Node(2)
-                node.wins[self.myid] = 1
-                node.wins[self.oppid] = 1
+                node.moves[i].wins[self.myid] = 1
+                node.moves[i].wins[self.oppid] = 1
         weights = [0]*l
         total = 0
         for i in range(0,l):
-            m = node.moves[moves[i]]
+            assert node.moves
+            try:
+                m = node.moves[moves[i]]
+            except Exception as e:
+                raise Exception(str(node.moves.keys()) + "\n\n\n" + str(moves))
             weights[i] = m.wins[turn]/m.trials
             total = total + weights[i]
         weights = [i/total for i in weights]
@@ -65,7 +69,7 @@ class MonteCarloBot:
             return Victory.LOSE
         elif result == Victory.LOSE:
             node.wins[self.myid] = node.wins[self.myid] + 1
-            return Victory.LOSE
+            return Victory.WIN
         else:
             return Victory.DRAW
 
@@ -73,12 +77,22 @@ class MonteCarloBot:
         root = Node(2)
         root.wins[self.myid] = 1
         root.wins[self.oppid] = 1
+        #print("\n\n\niterating\n\n\n")
         for i in range(0,iterations):
+            if i > 0:
+                raise Exception("abc")
+            #print("\n\n\nrunning iteration: "+ str(i) + "\n\n\n")
             self.monte_carlo_iter(copy.deepcopy(pos), root, self.myid)
-        return max(root.moves.items(), key=lambda m, n: n.wins/n.trials)[0]
+        
+        #var = max(root.moves.items(), key=lambda item: item[1].wins[self.myid]/item[1].trials)[0]
+        #print("\n\n\n\ntype: " + str(type(var)) + "\n\n\n\n")
+        return max(root.moves.items(), key=lambda item: item[1].wins[self.myid]/item[1].trials)[0]
 
     def get_move(self, pos, tleft):
-        #x = self.monte_carlo(pos, 1000)
-        lmoves = pos.legal_moves()
-        rm = randint(0, len(lmoves)-1)
-        return lmoves[rm]
+        #return self.monte_carlo(pos, 1000)
+        #print("GET MOVE RUNNING")
+        return self.monte_carlo(pos, 5)
+
+        #lmoves = pos.legal_moves()
+        #rm = randint(0, len(lmoves)-1)
+        #return lmoves[rm]

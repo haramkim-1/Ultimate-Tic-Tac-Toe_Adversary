@@ -1,5 +1,6 @@
 import os
 import sys
+import ast
 
 class InterfaceBot:
 
@@ -65,9 +66,11 @@ class InterfaceBot:
 
         #self.log.write("\nmove:\n" + received + "\n")
         #self.log.flush()
-        #return the selected move from lmoves
-        lmoves_strings = [str(x) for x in lmoves]
-        return lmoves[lmoves_strings.index(received)]
+
+        #return the selected move from lmoves - DISABLED
+        #lmoves_strings = [str(x) for x in lmoves]
+        #return lmoves[lmoves_strings.index(received)]
+        return ast.literal_eval(received)
 
     def check_pipe_exists(self):
         return os.path.exists(self.pipe_path)

@@ -8,7 +8,7 @@ class Position:
         self.mLastY = -1
 
     def __str__(self):
-        return ",".join(map(lambda x:str(x),self.board))
+        return "Position: " + ",".join(map(lambda x:str(x),self.board))
 
     def parse_field(self, fstr):
         flist = fstr.replace(';', ',').split(',')
@@ -65,10 +65,10 @@ class Position:
     def getMicroboardWinner(self, macroX, macroY):
         startY = macroX*3
         startX = macroY*3
-        for y in range(startX, startX+3):
+        for x in range(startX, startX+3):
             if (self.board  [startY*9+x] == self.board  [(startY+1)*9+x] and self.board  [(startY+1)*9+x] == self.board  [(startY+2)*9+x] and self.board  [(startY)*9+x] > 0):
                 return self.board  [startY*9+x]
-        for x in range(startY, startY+3):
+        for y in range(startY, startY+3):
             if (self.board  [y*9+startX] == self.board  [y*9+startX+1] and self.board  [y*9+startX+1] == self.board  [y*9+startX+2] and self.board  [y*9+startX] > 0):
                 return self.board  [y*9+startX]
         if (self.board  [startY*9+startX] == self.board  [(startY+1)*9+startX+1] and self.board  [(startY+1)*9+startX+1] == self.board  [(startY+2)*9+startX+2] and self.board  [startY*9+startX] > 0):
