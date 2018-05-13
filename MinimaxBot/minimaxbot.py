@@ -24,9 +24,9 @@ class MinimaxBot:
         # for each move, find minimax value and if greater than the best val,
         # change the best move and best val to this current move and value
         if len(lmoves) > 20:
-            max_d = 1
-        else:
             max_d = 3
+        else:
+            max_d = 5
         for move in lmoves:
             curr_val = self.minimax(move, pos, 1, max_d, True, self.minval, self.maxval)
             if curr_val > best_val:
@@ -47,7 +47,7 @@ class MinimaxBot:
         # if game is won, return appropriate value
         winner = pos.checkMacroboardWinner()
         if winner != 0:
-            return pos.sum_heuristics
+            return pos.sum_heuristics(self.myid, self.oppid)
 
         # make a copy of the current position so we can make moves on it
         pos_copy = copy.deepcopy(pos)

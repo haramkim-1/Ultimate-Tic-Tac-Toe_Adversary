@@ -23,8 +23,20 @@ class Position:
 
     def make_move(self, x, y, pid):
         mbx, mby = x//3, y//3
-        self.macroboard[3*mby+mbx] = -1
+        next_mbx, next_mby = x%3, y%3
         self.board[9*y+x] = pid
+        self.macroboard[3*mby+mbx] = self.getMicroboardWinner(mbx, mby)
+        if self.microboardFull(mbx, mby):
+            for macroX in range(0,2):
+                for macroY in range(0,2):
+                    if not self.microboardFull(macroX, macroY):
+                        self.macroboard[3*macroY + macroX] = -1
+        else:
+            for macroX in range(0,2):
+                for macroY in range(0,2):
+                    if self.macroboard[3*macroY+macroX] == -1:
+                        self.macroboard[3*macroY + macroX] = 0
+            self.macroboard[3*next_mbx + next_mby] = -1
 
     def get_board(self):
         return str.join(",", [str(i) for i in self.board])
