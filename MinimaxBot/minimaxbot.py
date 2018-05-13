@@ -9,19 +9,29 @@ class MinimaxBot:
 
     def __init__(self):
         self.log = open("minimax_log.log", "a+")
+        self.log.write("\n\n")
+        self.log.flush
 
     def get_move(self, pos, tleft):
+        self.log.write(str(pos.legal_moves())+": ")
+        self.log.flush()
         lmoves = pos.legal_moves()
         # TODO: initialize this to the first move in lmoves?
         best_move = None
         best_val = -sys.maxsize - 1
         # for each move, find minimax value and if greater than the best val,
         # change the best move and best val to this current move and value
+        if len(lmoves) > 20:
+            max_d = 1
+        else:
+            max_d = 3
         for move in lmoves:
-            curr_val = self.minimax(move, pos, 1, 3, True)
+            curr_val = self.minimax(move, pos, 1, max_d, True)
             if curr_val > best_val:
                 best_move = move
                 best_val = curr_val
+        self.log.write(str(best_move)+"\n")
+        self.log.flush()
         return best_move
 
     # returns minimax value of a move
