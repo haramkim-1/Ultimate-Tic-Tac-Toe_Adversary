@@ -53,16 +53,16 @@ public class HumanPlayer implements Bot {
                 ArrayList<Integer> botWon = new ArrayList<Integer>();
                 ArrayList<Integer> humanWon = new ArrayList<Integer>();
                 ArrayList<Integer> available = new ArrayList<Integer>();
-                Integer mustGo = null;
+                ArrayList<Integer> draws = new ArrayList<Integer>();
 
                 String[] board = splitLine[3].split(",");
                 for (int i = 0; i < board.length; i++) {
                     if (board[i].equals("0")) {
-                        available.add(i);
+                        draws.add(i);
                     } else if (board[i].equals(idString)) {
                         humanWon.add(i);
                     } else if (board[i].equals("-1")) {
-                        mustGo = i;
+                        available.add(i);
                     } else {
                         botWon.add(i);
                     }
@@ -70,6 +70,7 @@ public class HumanPlayer implements Bot {
 
                 Object[] bWon = botWon.stream().map(i -> getBoardName(i)).toArray();
                 Object[] hWon = humanWon.stream().map(i -> getBoardName(i)).toArray();
+                Object[] d = draws.stream().map(i -> getBoardName(i)).toArray();
                 Object[] av = available.stream().map(i -> getBoardName(i)).toArray();
 
                 if (bWon.length == 0) {
@@ -118,31 +119,50 @@ public class HumanPlayer implements Bot {
                     System.out.println(hsb.toString());
                 }
 
-                if (mustGo == null) {
-                    if (hWon.length == 0) {
-                        System.out.println("You may not play in any boards.");
-                    } else if (hWon.length == 1) {
-                        System.out.println("You must play in the " + hWon[0] + " microboard.");
-                    } else if (hWon.length == 2) {
-                        System.out.println("You must play in the " + hWon[0] + " or " + hWon[1] + " microboard.");
-                    } else {
-                        StringBuilder hsb = new StringBuilder(50);
-                        hsb.append("You must play in the ");
-
-                        for (int i = 0; i < hWon.length; i++) {
-                            hsb.append((String) hWon[i]);
-                            if (i == hWon.length - 2) {
-                                hsb.append(", or ");
-                            } else if (i != hWon.length - 1) {
-                                hsb.append(", ");
-                            }
-                        }
-
-                        hsb.append(" microboard.");
-                        System.out.println(hsb.toString());
-                    }
+                if (d.length == 0) {
+                    System.out.println("No microboards are draws.");
+                } else if (d.length == 1) {
+                    System.out.println("The " + d[0] + " microboard is a draw.");
+                } else if (d.length == 2) {
+                    System.out.println("The " + d[0] + " and " + d[1] + " microboards are draws.");
                 } else {
-                    System.out.println("You must play in the " + getBoardName(mustGo) + " microboard.");
+                    StringBuilder dsb = new StringBuilder(50);
+                    dsb.append("The ");
+
+                    for (int i = 0; i < d.length; i++) {
+                        dsb.append((String) d[i]);
+                        if (i == d.length - 2) {
+                            dsb.append(", and ");
+                        } else if (i != d.length - 1) {
+                            dsb.append(", ");
+                        }
+                    }
+
+                    dsb.append(" microboards are draws.");
+                    System.out.println(dsb.toString());
+                }
+
+                if (av.length == 0) {
+                    System.out.println("You may not play in any boards.");
+                } else if (av.length == 1) {
+                    System.out.println("You must play in the " + av[0] + " microboard.");
+                } else if (av.length == 2) {
+                    System.out.println("You must play in the " + av[0] + " or " + av[1] + " microboard.");
+                } else {
+                    StringBuilder asb = new StringBuilder(50);
+                    asb.append("You must play in the ");
+
+                    for (int i = 0; i < av.length; i++) {
+                        asb.append((String) av[i]);
+                        if (i == av.length - 2) {
+                            asb.append(", or ");
+                        } else if (i != av.length - 1) {
+                            asb.append(", ");
+                        }
+                    }
+
+                    asb.append(" microboard.");
+                    System.out.println(asb.toString());
                 }
             }
         }
