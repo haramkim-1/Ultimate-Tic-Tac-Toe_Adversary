@@ -6,6 +6,8 @@ class MinimaxBot:
 
     myid = -1
     oppid = -1
+    minval = -999999999
+    maxval = -minval
 
     def __init__(self):
         self.log = open("minimax_log.log", "a+")
@@ -26,7 +28,7 @@ class MinimaxBot:
         else:
             max_d = 3
         for move in lmoves:
-            curr_val = self.minimax(move, pos, 1, max_d, True)
+            curr_val = self.minimax(move, pos, 1, max_d, True, self.minval, self.maxval)
             if curr_val > best_val:
                 best_move = move
                 best_val = curr_val
@@ -35,7 +37,7 @@ class MinimaxBot:
         return best_move
 
     # returns minimax value of a move
-    def minimax(self, move, pos, depth, max_depth, my_turn):
+    def minimax(self, move, pos, depth, max_depth, my_turn, a, b):
         # if my turn, max
         # TODO check depth condition and if not met, use heuristic
         if depth == max_depth:
@@ -59,12 +61,13 @@ class MinimaxBot:
 
         # for each of these possible next moves, make the move using pos copy
         pos_copy.make_move(move[0], move[1], self.myid)
-
         if my_turn:
             started = False
             for l in lmoves:
                 # set value to
-                val = self.minimax(l, pos_copy, depth+1, max_depth, False)
+                val = self.minimax(l, pos_copy, depth+1, max_depth, False, max(a, self.minval),b)
+                if val >= b:
+                    return self.minval
                 if not started:
                     best_val = val
                 else:
@@ -76,7 +79,9 @@ class MinimaxBot:
             started = False
             for l in lmoves:
                 # set value to
-                val = self.minimax(l, pos_copy, depth+1, max_depth, True)
+                val = self.minimax(l, pos_copy, depth+1, max_depth, True, a, min(b, self.maxval))
+                if val <= a:
+                    return self.maxval
                 if not started:
                     best_val = val
                 else:
