@@ -22,6 +22,7 @@ class Position:
                 if self.is_legal(x, y)]
 
     def make_move(self, x, y, pid):
+        assert self.board[9*y+x] == 0
         mbx, mby = x//3, y//3
         next_mbx, next_mby = x%3, y%3
         self.board[9*y+x] = pid

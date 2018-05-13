@@ -23,6 +23,7 @@ class Position:
 
     def make_move(self, move, pid):
         x, y = move
+        assert self.board[9*y+x] == 0
         mbx, mby = x//3, y//3
         next_mbx, next_mby = x%3, y%3
         self.board[9*y+x] = pid

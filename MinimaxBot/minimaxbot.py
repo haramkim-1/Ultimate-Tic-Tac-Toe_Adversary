@@ -51,16 +51,21 @@ class MinimaxBot:
 
         # make a copy of the current position so we can make moves on it
         pos_copy = copy.deepcopy(pos)
+         # for each of these possible next moves, make the move using pos copy
+        if my_turn:
+            pos_copy.make_move(move[0], move[1], self.myid)
+        else:
+            pos_copy.make_move(move[0], move[1], self.oppid)
         # get the legal next moves from this position
         lmoves = pos_copy.legal_moves()
+        self.log.write("\t CURRENT LEGAL MOVES: " + str(lmoves)+"\t")
+        self.log.flush()
 
         # if no legal moves, i.e. at a terminal node, return num of boards won
         # by player whose turn it is
         if lmoves == []:
             return pos_copy.sum_heuristics(self.myid, self.oppid)
 
-        # for each of these possible next moves, make the move using pos copy
-        pos_copy.make_move(move[0], move[1], self.myid)
         if my_turn:
             started = False
             for l in lmoves:
