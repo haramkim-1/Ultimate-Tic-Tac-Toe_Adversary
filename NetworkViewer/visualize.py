@@ -161,7 +161,8 @@ def draw_net(config, genome, view=False, filename=None, node_names=None, show_di
         connections = set()
         for cg in genome.connections.values():
             if cg.enabled or show_disabled:
-                connections.add((cg.in_node_id, cg.out_node_id))
+                #connections.add((cg.in_node_id, cg.out_node_id))
+                connections.add((cg.key[0], cg.key[1]))
 
         used_nodes = copy.copy(outputs)
         pending = copy.copy(outputs)

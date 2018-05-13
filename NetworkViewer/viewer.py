@@ -26,7 +26,7 @@ if __name__ == '__main__':
             best = v
 
     #visualize
-    visualize.draw_net(config, best, view=True, show_disabled=False)
+    visualize.draw_net(config, best, view=True, show_disabled=False, prune_unused=False, fmt="png")
 
     
     

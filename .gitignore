@@ -136,3 +136,4 @@ NNBot/run_nnb_test.sh
 external_javabot/
 *.svg
 *.gv
+*.png
