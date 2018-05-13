@@ -7,6 +7,9 @@ class MinimaxBot:
     myid = -1
     oppid = -1
 
+    def __init__(self):
+        self.log = open("minimax_log.log", "a+")
+
     def get_move(self, pos, tleft):
         lmoves = pos.legal_moves()
         # TODO: initialize this to the first move in lmoves?
