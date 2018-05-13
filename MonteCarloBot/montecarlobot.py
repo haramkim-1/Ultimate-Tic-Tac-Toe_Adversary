@@ -114,7 +114,7 @@ class MonteCarloBot:
         #return self.monte_carlo(pos, 1000)
         #print("GET MOVE RUNNING")
         num_moves = len(pos.legal_moves())
-        return self.monte_carlo(pos, 20*num_moves+300)
+        return self.monte_carlo(pos, 100*num_moves+300)
 
         #lmoves = pos.legal_moves()
         #rm = randint(0, len(lmoves)-1)
