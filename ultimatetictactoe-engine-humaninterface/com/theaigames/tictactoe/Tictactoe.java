@@ -11,8 +11,8 @@ import com.theaigames.tictactoe.player.Player;
 
 public class Tictactoe extends AbstractGame {
 	
-	private final int TIMEBANK_MAX = 10000;
-	private final int TIME_PER_MOVE = 500;
+	private final int TIMEBANK_MAX = Integer.MAX_VALUE;
+	private final int TIME_PER_MOVE = Integer.MAX_VALUE;
 	private List<Player> players;
 
 	@Override
