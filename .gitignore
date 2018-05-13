@@ -137,3 +137,4 @@ NNBot/run_nnb_test.sh
 *.gv
 *.png
 .DS_Store
+*.class

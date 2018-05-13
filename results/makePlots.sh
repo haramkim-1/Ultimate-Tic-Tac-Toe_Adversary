@@ -22,8 +22,9 @@ for path in *; do #loop over all isoRMSD directories
 	gnuplot gnuplotPlottingScript.gp
 
 	#move output to plots directory
-	mv best.png ../plots/$(echo $dirname | sed -e 's/.*_//')_best.png
-	mv average.png ../plots/$(echo $dirname | sed -e 's/.*_//')_average.png
+	#mv best.png ../plots/$(echo $dirname | sed -e 's/.*_//')_best.png
+	#mv average.png ../plots/$(echo $dirname | sed -e 's/.*_//')_average.png
+	mv combined.png ../plots/$(echo $dirname | sed -e 's/.*_//')_combined.png
 	
 	#remove script
 	rm gnuplotPlottingScript.gp
