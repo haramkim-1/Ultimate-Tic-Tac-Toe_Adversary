@@ -35,15 +35,32 @@ if __name__ == '__main__':
     import sys
     from position import Position
     from minimaxbot import MinimaxBot
+    from filelock import FileLock
+    import os
+    import traceback
 
     pos = Position()
     bot = MinimaxBot()
 
-    while True:
+    exn_log_path = ".."+ os.sep + "logs"+ os.sep +"minmax_exn_log.log"
+    exn_log_lock_path = ".."+ os.sep + "logs"+ os.sep +"minmax_exn_log.log.lock"
+    exn_log_lock = FileLock(exn_log_lock_path)
+
+    try:
+        while True:
+            try:
+                instr = input()
+            except Exception as e:
+                sys.stderr.write('error reading input')
+            outstr = parse_command(instr, bot, pos)
+            sys.stdout.write(outstr)
+            sys.stdout.flush()
+    except Exception as e:
         try:
-            instr = input()
-        except Exception as e:
-            sys.stderr.write('error reading input')
-        outstr = parse_command(instr, bot, pos)
-        sys.stdout.write(outstr)
-        sys.stdout.flush()
+            exn_log_lock.acquire()
+            exn_log = open(exn_log_path, "a+")
+            exn_log.write(str(e) + "\n")
+            exn_log.write(str(traceback.format_exc()))
+            exn_log.close()
+        finally:
+            exn_log_lock.release()
