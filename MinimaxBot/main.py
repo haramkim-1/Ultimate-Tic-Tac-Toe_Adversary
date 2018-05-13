@@ -43,8 +43,7 @@ if __name__ == '__main__':
     bot = MinimaxBot()
 
     exn_log_path = ".." + os.sep + "logs" + os.sep + "minmax_exn_log.log"
-    exn_log_lock_path = ".." + os.sep + "logs" + os.sep +
-            "minmax_exn_log.log.lock"
+    exn_log_lock_path = ".." + os.sep + "logs" + os.sep +"minmax_exn_log.log.lock"
     exn_log_lock = FileLock(exn_log_lock_path)
 
     try:
