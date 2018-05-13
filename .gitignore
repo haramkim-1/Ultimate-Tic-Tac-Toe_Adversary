@@ -137,3 +137,4 @@ external_javabot/
 *.svg
 *.gv
 *.png
+.DS_Store
