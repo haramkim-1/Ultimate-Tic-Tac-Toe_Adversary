@@ -92,15 +92,20 @@ public abstract class AbstractGame implements Logic {
 
 		try {
 			botId = Integer.parseInt(args[0]);
+			if (botId != 1 && botId != 2) {
+				throw new RuntimeException("Argument 1 is not 1 or 2.");
+			}
+
+			//add players
+			if (botId == 2)
+				this.engine.addHumanPlayer("1", LOG_MOVES);
+			this.engine.addPlayer(args[1], botId + "", LOG_MOVES);
+			if (botId == 1)
+				this.engine.addHumanPlayer("2", LOG_MOVES);
+
 		} catch (NumberFormatException e) {
 			throw new RuntimeException("Argument 1 is not an integer.");
 		}
-		if (botId != 1 && botId != 2) {
-			throw new RuntimeException("Argument 1 is not 1 or 2.");
-		}
-
-		// add the players
-		this.engine.addPlayer(args[1], botId + "", LOG_MOVES);
 	}
 	
 	/**
