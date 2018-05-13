@@ -46,6 +46,7 @@ class Position:
 
     # return number of microboards won by me if my_turn is true and number of
     # microboards won by opponent if my_turn is false
+    #TODO: this counts draws as wins for the opponent
     def num_boards_won(self, myid, my_turn):
         won = 0
         for x in range(0, 2):
@@ -57,8 +58,8 @@ class Position:
         return won
 
     def getMicroboardWinner(self, macroX, macroY):
-        startY = macroX*3
-        startX = macroY*3
+        startY = macroY*3
+        startX = macroX*3
         for x in range(startX, startX+3):
             if (self.board[startY*9+x] == self.board[(startY+1)*9+x] and
                     self.board[(startY+1)*9+x] == self.board[(startY+2)*9+x]
@@ -101,3 +102,111 @@ class Position:
                 self.macroboard[2*3+0] > 0):
             return self.macroboard[2*3+0]
         return 0
+    
+    def getMicroboardHeuristic(self, macroX, macroY, myid, oppid):
+        startX = macroX*3
+        startY = macroY*3
+        #implement heuristic from russel and norvig
+        #the perspective in writing is that myid is X, but works either way
+        X1 = 0
+        X2 = 0
+        O1 = 0
+        O2 = 0
+        xcount = 0
+        ocount = 0
+        #check horizontal rows
+        for x in range(startX, startX+3):
+            for y in range(startY, startY+3):
+                if self.board[9*y+x] == myid:
+                    xcount = xcount + 1
+                elif self.board[9*y+x] == oppid:
+                    ocount = ocount + 1
+            if ocount == 0:
+                if xcount == 1:
+                    X1 = X1 + 1
+                elif xcount == 2:
+                    X2 = X2 + 1
+                elif xcount == 3:
+                    return 15
+            if xcount == 0:
+                if ocount == 1:
+                    O1 = O1 + 1
+                elif ocount == 2:
+                    O2 = O2 + 1
+                elif ocount == 3:
+                    return -15
+            xcount = 0
+            ocount = 0
+        #check vertical rows
+        for y in range(startY, startY+3):
+            for x in range(startX, startX+3):
+                if self.board[9*y+x] == myid:
+                    xcount = xcount + 1
+                elif self.board[9*y+x] == oppid:
+                    ocount = ocount + 1
+            if ocount == 0:
+                if xcount == 1:
+                    X1 = X1 + 1
+                elif xcount == 2:
+                    X2 = X2 + 1
+                elif xcount == 3:
+                    return 15
+            if xcount == 0:
+                if ocount == 1:
+                    O1 = O1 + 1
+                elif ocount == 2:
+                    O2 = O2 + 1
+                elif ocount == 3:
+                    return -15
+            xcount = 0
+            ocount = 0
+        #check diagonals
+        for i in range(0, 3):
+            if self.board[9*(i + startY)+(i + startX)] == myid:
+                 xcount = xcount + 1
+            elif self.board[9*(i + startY)+(i + startX)] == oppid:
+                ocount = ocount + 1
+        if ocount == 0:
+            if xcount == 1:
+                X1 = X1 + 1
+            elif xcount == 2:
+                X2 = X2 + 1
+            elif xcount == 3:
+                return 15
+        if xcount == 0:
+            if ocount == 1:
+                O1 = O1 + 1
+            elif ocount == 2:
+                O2 = O2 + 1
+            elif ocount == 3:
+                return -15
+        xcount = 0
+        ocount = 0
+        for i in range(0, 3):
+            if self.board[9*(2 - i + startY)+(i + startX)] == myid:
+                 xcount = xcount + 1
+            elif self.board[9*(2 - i + startY)+(i + startX)] == oppid:
+                ocount = ocount + 1
+        if ocount == 0:
+            if xcount == 1:
+                X1 = X1 + 1
+            elif xcount == 2:
+                X2 = X2 + 1
+            elif xcount == 3:
+                return 15
+        if xcount == 0:
+            if ocount == 1:
+                O1 = O1 + 1
+            elif ocount == 2:
+                O2 = O2 + 1
+            elif ocount == 3:
+                return -15
+        #calculate final heuristic
+        return 3*X2 + X1 - 3*O2 - O1
+
+    def sum_heuristics(self, myid, oppid):
+        total = 0
+        for x in range(0,3):
+            for y in range(0,3):
+                total = total + self.getMicroboardHeuristic(x, y, myid, oppid)
+        return total
