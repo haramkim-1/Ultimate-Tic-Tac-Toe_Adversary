@@ -15,7 +15,8 @@ set ylabel offset -0,0
 
 clear
 
-set yrange [0:0.95]
+#set yrange [0:0.95]
+set yrange [0:0.04]
 unset key
 
 #output
