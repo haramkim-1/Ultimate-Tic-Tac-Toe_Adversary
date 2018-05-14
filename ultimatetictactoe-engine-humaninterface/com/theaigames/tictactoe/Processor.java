@@ -59,11 +59,8 @@ public class Processor implements GameHandler {
 				player.sendUpdate("field", mField.toString());
 				player.sendUpdate("macroboard", mField.macroboardToString());
 				String response = player.requestMove("move");
-				if (!parseResponse(response, player)) {
+				while (!parseResponse(response, player)) {
 					response = player.requestMove("move");
-					if (!parseResponse(response, player)) {
-					    mGameOverByPlayerErrorPlayerId = player.getId(); /* Too many errors, other player wins */
-					}
 				}
 				mMoveNumber++;
 			}

@@ -53,24 +53,20 @@ public class HumanPlayer implements Bot {
                 ArrayList<Integer> botWon = new ArrayList<Integer>();
                 ArrayList<Integer> humanWon = new ArrayList<Integer>();
                 ArrayList<Integer> available = new ArrayList<Integer>();
-                ArrayList<Integer> draws = new ArrayList<Integer>();
 
                 String[] board = splitLine[3].split(",");
                 for (int i = 0; i < board.length; i++) {
-                    if (board[i].equals("0")) {
-                        draws.add(i);
-                    } else if (board[i].equals(idString)) {
+                    if (board[i].equals(idString)) {
                         humanWon.add(i);
                     } else if (board[i].equals("-1")) {
                         available.add(i);
-                    } else {
+                    } else if (!board[i].equals("0")) {
                         botWon.add(i);
                     }
                 }
 
                 Object[] bWon = botWon.stream().map(i -> getBoardName(i)).toArray();
                 Object[] hWon = humanWon.stream().map(i -> getBoardName(i)).toArray();
-                Object[] d = draws.stream().map(i -> getBoardName(i)).toArray();
                 Object[] av = available.stream().map(i -> getBoardName(i)).toArray();
 
                 if (bWon.length == 0) {
@@ -117,29 +113,6 @@ public class HumanPlayer implements Bot {
 
                     hsb.append(" microboards.");
                     System.out.println(hsb.toString());
-                }
-
-                if (d.length == 0) {
-                    System.out.println("No microboards are draws.");
-                } else if (d.length == 1) {
-                    System.out.println("The " + d[0] + " microboard is a draw.");
-                } else if (d.length == 2) {
-                    System.out.println("The " + d[0] + " and " + d[1] + " microboards are draws.");
-                } else {
-                    StringBuilder dsb = new StringBuilder(50);
-                    dsb.append("The ");
-
-                    for (int i = 0; i < d.length; i++) {
-                        dsb.append((String) d[i]);
-                        if (i == d.length - 2) {
-                            dsb.append(", and ");
-                        } else if (i != d.length - 1) {
-                            dsb.append(", ");
-                        }
-                    }
-
-                    dsb.append(" microboards are draws.");
-                    System.out.println(dsb.toString());
                 }
 
                 if (av.length == 0) {
@@ -213,6 +186,6 @@ public class HumanPlayer implements Bot {
     }
 
     public void outputEngineWarning(String warning) {
-        System.out.println("Warning: "+warning);
+        System.out.println(warning);
     }
 }

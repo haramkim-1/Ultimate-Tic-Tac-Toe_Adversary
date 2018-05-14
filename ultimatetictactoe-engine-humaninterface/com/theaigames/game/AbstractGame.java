@@ -175,7 +175,7 @@ public abstract class AbstractGame implements Logic {
 		if (winner == null)
 			System.out.println("Draw!");
 		else
-			System.out.println("winner: " + this.processor.getWinner());
+			System.out.println("winner: " + this.processor.getWinner().getName());
 
 		// save results to file here
 		String playedGame = this.processor.getPlayedGame();

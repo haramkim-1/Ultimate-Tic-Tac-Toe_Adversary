@@ -28,7 +28,7 @@ public class Tictactoe extends AbstractGame {
 
 		for(int i=0; i<players.size(); i++) {
 			// create the player
-			String playerName = String.format("player%d", i+1);
+			String playerName = String.format(i == 0 ? "X" : "O");
 			Player player = new Player(playerName, players.get(i), TIMEBANK_MAX, TIME_PER_MOVE, i+1);
 			this.players.add(player);
 
